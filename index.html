@@ -4,239 +4,98 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>InBold Food Menu</title>    
-
     <style>
+        /* CSS GIỮ NGUYÊN */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        
-        :root {
-            --bg-gradient: linear-gradient(135deg, #1e293b 0%, #334155 25%, #475569 50%, #334155 75%, #1e293b 100%);
-            --text-primary: #e2e8f0;
-            --text-secondary: #cbd5e1;
-            --text-muted: #64748b;
-            --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-            --success-gradient: linear-gradient(135deg, #10b981 0%, #34d399 100%);
-            --danger-gradient: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
-            --panel-bg: rgba(30, 41, 59, 0.95);
-            --border-color: rgba(148, 163, 184, 0.2);
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-gradient);
-            background-attachment: fixed;
-            color: var(--text-primary);
-            height: 100vh;
-            height: 100dvh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            left: 0;
-        }
-        
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
-            z-index: -1;
-            animation: backgroundMove 20s ease-in-out infinite;
-        }
-        
-        @keyframes backgroundMove { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
-        
-        .app-container { flex: 1; display: flex; flex-direction: column; padding: 20px; max-width: 1200px; margin: 0 auto; width: 100%; height: 100%; overflow: hidden; }
-        
-        /* Toggle Header */
-        .toggle-header { display: flex; background: rgba(30, 41, 59, 0.9); backdrop-filter: blur(20px); border: 1px solid var(--border-color); border-radius: 20px; padding: 6px; margin-bottom: 40px; align-self: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(148, 163, 184, 0.1); position: relative; }
-        .toggle-button { padding: 14px 28px; background: transparent; border: none; border-radius: 16px; font-size: 16px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); min-width: 120px; position: relative; z-index: 2; }
-        .toggle-button.active { background: var(--accent-gradient); color: #ffffff; box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3), 0 4px 6px -2px rgba(59, 130, 246, 0.2); transform: translateY(-1px); }
-        .toggle-button:hover:not(.active) { background: rgba(30, 41, 59, 0.6); color: var(--text-primary); transform: translateY(-1px); }
-        
-        /* Loading Overlay */
-        .loading-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; z-index: 100; }
-        .loading-text { font-size: 18px; color: #94a3b8; font-weight: 600; text-align: center; }
-        
-        /* Today Mode */
-        .today-mode { flex: 1; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 30px; padding: 20px; }
-        .today-mode.active { display: flex; }
-        .today-content { text-align: center; max-width: 600px; width: 100%; }
-        .today-greeting { font-size: 22px; color: var(--text-secondary); margin-bottom: 8px; font-weight: 500;}
-        .today-greeting .user-name { font-weight: 700; color: #fff; }
-        .today-dish-name { font-size: 40px; font-weight: 800; color: #ffffff; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; min-height: 50px; }
-        
-        .eaten-button { background: var(--success-gradient); color: #ffffff; font-size: 24px; font-weight: 700; padding: 20px 40px; border: none; border-radius: 24px; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3), 0 4px 6px -2px rgba(16, 185, 129, 0.2); width: 100%; max-width: 400px; }
-        .eaten-button:hover { transform: translateY(-2px); box-shadow: 0 20px 25px -5px rgba(16, 185, 129, 0.4), 0 10px 10px -5px rgba(16, 185, 129, 0.2); }
-        .eaten-button:disabled { background: linear-gradient(135deg, #64748b 0%, #94a3b8 100%); cursor: not-allowed; transform: none; box-shadow: none; }
-        
-        .user-selector-wrapper { position: relative; max-width: 400px; width: 100%; }
-        .user-selector { width: 100%; padding: 12px 16px; font-size: 16px; border: none; border-radius: 12px; background: transparent; color: var(--text-primary); outline: none; font-weight: 500; appearance: none; cursor: pointer; text-align: center; border-bottom: 2px solid var(--border-color); }
-        .user-selector:focus { border-color: rgba(59, 130, 246, 0.5); }
-        
-        /* Menu Mode */
-        .menu-mode { flex: 1; display: none; flex-direction: column; }
-        .menu-mode.active { display: flex; }
-        .menu-controls { margin-bottom: 24px; display: flex; justify-content: center; align-items: center; gap: 12px; }
-        .menu-search { flex-grow: 1; max-width: 450px; }
-        .menu-search input { width: 100%; padding: 18px 24px; font-size: 16px; border: 2px solid var(--border-color); border-radius: 20px; background: var(--panel-bg); backdrop-filter: blur(20px); color: #ffffff; outline: none; font-weight: 600; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(148, 163, 184, 0.1); }
-        .menu-search input::placeholder { color: var(--text-muted); }
-        .menu-search input:focus { border-color: rgba(59, 130, 246, 0.5); background: rgba(30, 41, 59, 0.95); box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.2), 0 0 0 3px rgba(59, 130, 246, 0.1); }
-        .shift-filter-btn { font-size: 24px; background: var(--panel-bg); border: 2px solid var(--border-color); border-radius: 50%; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; }
-        .shift-filter-btn:hover { border-color: rgba(59, 130, 246, 0.5); transform: scale(1.05); }
-
-        .menu-container { background: var(--panel-bg); backdrop-filter: blur(20px); border: 1px solid var(--border-color); border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(148, 163, 184, 0.1); overflow: hidden; height: calc(100vh - 220px); display: flex; flex-direction: column; }
-        .menu-content { flex: 1; overflow-y: auto; }
-        .menu-table { width: 100%; border-collapse: collapse; }
-        .menu-table th { background: rgba(59, 130, 246, 0.1); backdrop-filter: blur(10px); padding: 20px 24px; text-align: left; font-weight: 700; color: #ffffff; border-bottom: 2px solid rgba(148, 163, 184, 0.1); position: sticky; top: 0; z-index: 5; font-size: 16px; }
-        .menu-table th:first-child { width: 60px; text-align: center; }
-        .menu-table td { padding: 18px 24px; border-bottom: 1px solid rgba(148, 163, 184, 0.05); color: var(--text-secondary); font-weight: 500; font-size: 15px; }
-        .menu-table td:first-child { text-align: center; }
-        .menu-table tr { transition: background-color 0.2s ease, opacity 0.3s ease; }
-        .menu-table tr:hover { background: rgba(59, 130, 246, 0.05); }
-        .menu-table tr.eaten-row { opacity: 0.5; }
-        .menu-table tr.eaten-row:hover { opacity: 0.7; }
-        
-        .checkbox-container input[type="checkbox"] { width: 20px; height: 20px; accent-color: #10b981; cursor: pointer; }
-        
-        /* About Mode */
-        .about-mode { flex: 1; display: none; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
-        .about-mode.active { display: flex; }
-        .about-container { background: var(--panel-bg); backdrop-filter: blur(20px); border: 1px solid var(--border-color); border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(148, 163, 184, 0.1); padding: 40px; max-width: 550px; width: 100%; }
-        .about-section { margin-bottom: 32px; }
-        .about-section:last-child { margin-bottom: 0; }
-        .about-title { font-size: 24px; font-weight: 800; color: #ffffff; margin-bottom: 20px; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .about-list { list-style: none; padding: 0; }
-        .about-list li { padding: 2px 0 2px 28px; color: var(--text-secondary); font-size: 16px; position: relative; line-height: 1.6; }
-        .about-list li:before { content: "•"; color: #3b82f6; font-weight: bold; position: absolute; left: 0; font-size: 20px; }
-        .contact-button { display: inline-block; background: var(--accent-gradient); color: #ffffff; font-size: 16px; font-weight: 600; padding: 14px 28px; border: none; border-radius: 16px; text-decoration: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3), 0 4px 6px -2px rgba(59, 130, 246, 0.2); cursor: pointer; margin-right: 12px; margin-bottom: 12px; }
-        .contact-button:hover { transform: translateY(-2px); box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.4), 0 10px 10px -5px rgba(59, 130, 246, 0.2); }
-        .contact-button.danger { background: var(--danger-gradient); box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.3), 0 4px 6px -2px rgba(239, 68, 68, 0.2); }
-        .contact-button.danger:hover { box-shadow: 0 20px 25px -5px rgba(239, 68, 68, 0.4), 0 10px 10px -5px rgba(239, 68, 68, 0.2); }
-        
-        .hidden { display: none !important; }
-        
-        /* Mobile Responsiveness */
-        @media (max-width: 768px) {
-            .app-container { padding: 16px; }
-            .today-greeting { font-size: 18px; }
-            .today-dish-name { font-size: 32px; min-height: 40px; }
-            .eaten-button { font-size: 20px; padding: 18px 32px; }
-            .toggle-button { font-size: 14px; padding: 12px 24px; min-width: 100px; }
-            .menu-table th, .menu-table td { padding: 16px 20px; font-size: 14px; }
-            .about-container { padding: 32px 24px; }
-            .menu-search input { font-size: 14px; padding: 16px 20px; }
-            .shift-filter-btn { width: 50px; height: 50px; font-size: 22px; }
-        }
-        
-        @media (max-width: 480px) {
-            .today-greeting { font-size: 16px; }
-            .today-dish-name { font-size: 24px; min-height: 30px; }
-            .eaten-button { font-size: 18px; padding: 16px 28px; }
-            .toggle-button { font-size: 13px; padding: 10px 16px; min-width: 0; }
-            .toggle-header { padding: 4px; }
-            .about-container { padding: 24px 20px; margin: 12px; }
-            .menu-search input { padding: 14px 18px; }
-            .toggle-header { margin-bottom: 32px; }
-        }
-        
-        /* Custom Scrollbar */
-        .menu-content::-webkit-scrollbar { width: 8px; }
-        .menu-content::-webkit-scrollbar-track { background: rgba(148, 163, 184, 0.1); border-radius: 4px; }
-        .menu-content::-webkit-scrollbar-thumb { background: var(--accent-gradient); border-radius: 4px; }
-        .menu-content::-webkit-scrollbar-thumb:hover { background: linear-gradient(135deg, #2563eb, #7c3aed); }
+        :root{--bg-gradient: linear-gradient(135deg, #1e293b 0%, #334155 25%, #475569 50%, #334155 75%, #1e293b 100%);--text-primary: #e2e8f0;--text-secondary: #cbd5e1;--text-muted: #64748b;--accent-gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);--success-gradient: linear-gradient(135deg, #10b981 0%, #34d399 100%);--danger-gradient: linear-gradient(135deg, #ef4444 0%, #f87171 100%);--panel-bg: rgba(30, 41, 59, 0.95);--border-color: rgba(148, 163, 184, 0.2);}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter', -apple-system, BlinkMacSystemFont, sans-serif;background:var(--bg-gradient);background-attachment:fixed;color:var(--text-primary);height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden;position:fixed;width:100%;top:0;left:0}
+        body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%), radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);z-index:-1;animation:backgroundMove 20s ease-in-out infinite}
+        @keyframes backgroundMove{0%, 100%{opacity:1}50%{opacity:.8}}
+        .app-container{flex:1;display:flex;flex-direction:column;padding:20px;max-width:1200px;margin:0 auto;width:100%;height:100%;overflow:hidden}
+        .toggle-header{display:flex;background:rgba(30, 41, 59, 0.9);backdrop-filter:blur(20px);border:1px solid var(--border-color);border-radius:20px;padding:6px;margin-bottom:40px;align-self:center;box-shadow:0 20px 25px -5px rgba(0,0,0,.4), 0 10px 10px -5px rgba(0,0,0,.04), inset 0 1px 0 rgba(148,163,184,.1);position:relative}
+        .toggle-button{padding:14px 28px;background:transparent;border:none;border-radius:16px;font-size:16px;font-weight:600;color:var(--text-muted);cursor:pointer;transition:all .3s cubic-bezier(.4,0,.2,1);min-width:120px;position:relative;z-index:2}
+        .toggle-button.active{background:var(--accent-gradient);color:#fff;box-shadow:0 10px 15px -3px rgba(59,130,246,.3), 0 4px 6px -2px rgba(59,130,246,.2);transform:translateY(-1px)}
+        .toggle-button:hover:not(.active){background:rgba(30,41,59,.6);color:var(--text-primary);transform:translateY(-1px)}
+        .loading-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(30,41,59,.95);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;z-index:100}
+        .loading-text{font-size:18px;color:#94a3b8;font-weight:600;text-align:center}
+        .today-mode{flex:1;display:none;flex-direction:column;align-items:center;justify-content:center;gap:30px;padding:20px}
+        .today-mode.active{display:flex}
+        .today-content{text-align:center;max-width:600px;width:100%}
+        .today-greeting{font-size:22px;color:var(--text-secondary);margin-bottom:8px;font-weight:500}
+        .today-greeting .user-name{font-weight:700;color:#fff}
+        .today-dish-name{font-size:40px;font-weight:800;color:#fff;background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;min-height:50px}
+        .eaten-button{background:var(--success-gradient);color:#fff;font-size:24px;font-weight:700;padding:20px 40px;border:none;border-radius:24px;cursor:pointer;transition:all .3s cubic-bezier(.4,0,.2,1);box-shadow:0 10px 15px -3px rgba(16,185,129,.3), 0 4px 6px -2px rgba(16,185,129,.2);width:100%;max-width:400px}
+        .eaten-button:hover{transform:translateY(-2px);box-shadow:0 20px 25px -5px rgba(16,185,129,.4), 0 10px 10px -5px rgba(16,185,129,.2)}
+        .eaten-button:disabled{background:linear-gradient(135deg, #64748b 0%, #94a3b8 100%);cursor:not-allowed;transform:none;box-shadow:none}
+        .user-selector-wrapper{position:relative;max-width:400px;width:100%}
+        .user-selector{width:100%;padding:12px 16px;font-size:16px;border:none;border-radius:12px;background:transparent;color:var(--text-primary);outline:none;font-weight:500;appearance:none;cursor:pointer;text-align:center;border-bottom:2px solid var(--border-color)}
+        .user-selector:focus{border-color:rgba(59,130,246,.5)}
+        .menu-mode{flex:1;display:none;flex-direction:column}
+        .menu-mode.active{display:flex}
+        .menu-controls{margin-bottom:24px;display:flex;justify-content:center;align-items:center;gap:12px}
+        .menu-search{flex-grow:1;max-width:450px}
+        .menu-search input{width:100%;padding:18px 24px;font-size:16px;border:2px solid var(--border-color);border-radius:20px;background:var(--panel-bg);backdrop-filter:blur(20px);color:#fff;outline:none;font-weight:600;transition:all .3s cubic-bezier(.4,0,.2,1);box-shadow:0 4px 6px -1px rgba(0,0,0,.1), inset 0 1px 0 rgba(148,163,184,.1)}
+        .menu-search input::placeholder{color:var(--text-muted)}
+        .menu-search input:focus{border-color:rgba(59,130,246,.5);background:rgba(30,41,59,.95);box-shadow:0 10px 15px -3px rgba(59,130,246,.2), 0 0 0 3px rgba(59,130,246,.1)}
+        .shift-filter-btn{font-size:24px;background:var(--panel-bg);border:2px solid var(--border-color);border-radius:50%;width:56px;height:56px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s ease}
+        .shift-filter-btn:hover{border-color:rgba(59,130,246,.5);transform:scale(1.05)}
+        .menu-container{background:var(--panel-bg);backdrop-filter:blur(20px);border:1px solid var(--border-color);border-radius:24px;box-shadow:0 25px 50px -12px rgba(0,0,0,.5), inset 0 1px 0 rgba(148,163,184,.1);overflow:hidden;height:calc(100vh - 220px);display:flex;flex-direction:column}
+        .menu-content{flex:1;overflow-y:auto}
+        .menu-table{width:100%;border-collapse:collapse}
+        .menu-table th{background:rgba(59,130,246,.1);backdrop-filter:blur(10px);padding:20px 24px;text-align:left;font-weight:700;color:#fff;border-bottom:2px solid rgba(148,163,184,.1);position:sticky;top:0;z-index:5;font-size:16px}
+        .menu-table th:first-child{width:60px;text-align:center}
+        .menu-table td{padding:18px 24px;border-bottom:1px solid rgba(148,163,184,.05);color:var(--text-secondary);font-weight:500;font-size:15px}
+        .menu-table td:first-child{text-align:center}
+        .menu-table tr{transition:background-color .2s ease, opacity .3s ease}
+        .menu-table tr:hover{background:rgba(59,130,246,.05)}
+        .menu-table tr.eaten-row{opacity:.5}
+        .menu-table tr.eaten-row:hover{opacity:.7}
+        .checkbox-container input[type=checkbox]{width:20px;height:20px;accent-color:#10b981;cursor:pointer}
+        .about-mode{flex:1;display:none;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+        .about-mode.active{display:flex}
+        .about-container{background:var(--panel-bg);backdrop-filter:blur(20px);border:1px solid var(--border-color);border-radius:24px;box-shadow:0 25px 50px -12px rgba(0,0,0,.5), inset 0 1px 0 rgba(148,163,184,.1);padding:40px;max-width:550px;width:100%}
+        .about-section{margin-bottom:32px}
+        .about-section:last-child{margin-bottom:0}
+        .about-title{font-size:24px;font-weight:800;color:#fff;margin-bottom:20px;background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .about-list{list-style:none;padding:0}
+        .about-list li{padding:2px 0 2px 28px;color:var(--text-secondary);font-size:16px;position:relative;line-height:1.6}
+        .about-list li:before{content:"•";color:#3b82f6;font-weight:700;position:absolute;left:0;font-size:20px}
+        .contact-button{display:inline-block;background:var(--accent-gradient);color:#fff;font-size:16px;font-weight:600;padding:14px 28px;border:none;border-radius:16px;text-decoration:none;transition:all .3s cubic-bezier(.4,0,.2,1);box-shadow:0 10px 15px -3px rgba(59,130,246,.3), 0 4px 6px -2px rgba(59,130,246,.2);cursor:pointer;margin-right:12px;margin-bottom:12px}
+        .contact-button:hover{transform:translateY(-2px);box-shadow:0 20px 25px -5px rgba(59,130,246,.4), 0 10px 10px -5px rgba(59,130,246,.2)}
+        .contact-button.danger{background:var(--danger-gradient);box-shadow:0 10px 15px -3px rgba(239,68,68,.3), 0 4px 6px -2px rgba(239,68,68,.2)}
+        .contact-button.danger:hover{box-shadow:0 20px 25px -5px rgba(239,68,68,.4), 0 10px 10px -5px rgba(239,68,68,.2)}
+        .hidden{display:none!important}
+        @media (max-width:768px){.app-container{padding:16px}.today-greeting{font-size:18px}.today-dish-name{font-size:32px;min-height:40px}.eaten-button{font-size:20px;padding:18px 32px}.toggle-button{font-size:14px;padding:12px 24px;min-width:100px}.menu-table th,.menu-table td{padding:16px 20px;font-size:14px}.about-container{padding:32px 24px}.menu-search input{font-size:14px;padding:16px 20px}.shift-filter-btn{width:50px;height:50px;font-size:22px}}
+        @media (max-width:480px){.today-greeting{font-size:16px}.today-dish-name{font-size:24px;min-height:30px}.eaten-button{font-size:18px;padding:16px 28px}.toggle-button{font-size:13px;padding:10px 16px;min-width:0}.toggle-header{padding:4px}.about-container{padding:24px 20px;margin:12px}.menu-search input{padding:14px 18px}.toggle-header{margin-bottom:32px}}
+        .menu-content::-webkit-scrollbar{width:8px}
+        .menu-content::-webkit-scrollbar-track{background:rgba(148,163,184,.1);border-radius:4px}
+        .menu-content::-webkit-scrollbar-thumb{background:var(--accent-gradient);border-radius:4px}
+        .menu-content::-webkit-scrollbar-thumb:hover{background:linear-gradient(135deg, #2563eb, #7c3aed)}
     </style>
 </head>
 <body>
     <div class="app-container">
-        <!-- Loading Overlay -->
-        <div class="loading-overlay" id="loading-overlay">
-            <div class="loading-text" id="loading-text">Đang khởi tạo...</div>
-        </div>
-        
-        <!-- Toggle Header -->
-        <div class="toggle-header" id="toggle-header">
-            <button class="toggle-button" id="menu-tab" data-mode="menu">Menu</button>
-            <button class="toggle-button active" id="today-tab" data-mode="today">Today</button>
-            <button class="toggle-button" id="about-tab" data-mode="about">About</button>
-        </div>
-        
-        <!-- Today Mode -->
-        <div class="today-mode active" id="today-mode">
-            <div class="today-content">
-                <p class="today-greeting" id="today-greeting">Chào <span class="user-name">bạn</span>,</p>
-                <h2 class="today-dish-name" id="dish-name">Đang tải...</h2>
-            </div>
-            
-            <button class="eaten-button" id="eaten-button" onclick="markAsEaten()">
-                Đã ăn
-            </button>
-            
-            <div class="user-selector-wrapper">
-                <select id="user-select" class="user-selector">
-                    <option value="">-- Chọn tên của bạn --</option>
-                </select>
-            </div>
-        </div>
-        
-        <!-- Menu Mode -->
-        <div class="menu-mode" id="menu-mode">
-            <div class="menu-controls">
-                <div class="menu-search">
-                    <input type="text" id="menu-search-input" placeholder="Tìm kiếm tên nhân viên..." autocomplete="off">
-                </div>
-                <button class="shift-filter-btn" id="shift-filter-btn" title="Lọc theo ca">😂</button>
-            </div>
-            <div class="menu-container">
-                <div class="menu-content">
-                    <table class="menu-table" id="menu-table">
-                        <!-- Table content will be populated by JavaScript -->
-                    </table>
-                </div>
-            </div>
-        </div>
-        
-        <!-- About Mode -->
-        <div class="about-mode" id="about-mode">
-            <div class="about-container">
-                <div class="about-section">
-                    <h3 class="about-title">Features:</h3>
-                    <ul class="about-list">
-                        <li>Xem món ăn hôm nay theo thứ trong tuần.</li>
-                        <li>Đánh dấu và bỏ đánh dấu đã ăn cho từng người.</li>
-                        <li>Tìm kiếm và lọc nhân viên theo ca làm việc.</li>
-                        <li>Hiển thị menu theo ngày trong tuần.</li>
-                        <li>Tích hợp Google Sheets để cập nhật dữ liệu real-time.</li>
-                        <li>Lưu lại tên người dùng đã chọn.</li>
-                    </ul>
-                </div>
-                <div class="about-section">
-                    <button class="contact-button danger" onclick="clearCacheAndReload()">Xóa Cache</button>
-                    <a href="mailto:tri.vu.trong@inbold.com" class="contact-button">tri.vu.trong@inbold.com</a>
-                </div>
-            </div>
-        </div>
+        <!-- CÁC THẺ HTML GIỮ NGUYÊN -->
+        <div class="loading-overlay" id="loading-overlay"><div class="loading-text" id="loading-text">Đang khởi tạo...</div></div>
+        <div class="toggle-header" id="toggle-header"><button class="toggle-button" id="menu-tab" data-mode="menu">Menu</button><button class="toggle-button active" id="today-tab" data-mode="today">Today</button><button class="toggle-button" id="about-tab" data-mode="about">About</button></div>
+        <div class="today-mode active" id="today-mode"><div class="today-content"><p class="today-greeting" id="today-greeting">Chào <span class="user-name">bạn</span>,</p><h2 class="today-dish-name" id="dish-name">Đang tải...</h2></div><button class="eaten-button" id="eaten-button" onclick="markAsEaten()">Đã ăn</button><div class="user-selector-wrapper"><select id="user-select" class="user-selector"><option value="">-- Chọn tên của bạn --</option></select></div></div>
+        <div class="menu-mode" id="menu-mode"><div class="menu-controls"><div class="menu-search"><input type="text" id="menu-search-input" placeholder="Tìm kiếm tên nhân viên..." autocomplete="off"></div><button class="shift-filter-btn" id="shift-filter-btn" title="Lọc theo ca">😂</button></div><div class="menu-container"><div class="menu-content"><table class="menu-table" id="menu-table"></table></div></div></div>
+        <div class="about-mode" id="about-mode"><div class="about-container"><div class="about-section"><h3 class="about-title">Features:</h3><ul class="about-list"><li>Xem món ăn hôm nay theo thứ trong tuần.</li><li>Đánh dấu và bỏ đánh dấu đã ăn cho từng người.</li><li>Tìm kiếm và lọc nhân viên theo ca làm việc.</li><li>Hiển thị menu theo ngày trong tuần.</li><li>Tích hợp Google Sheets để cập nhật dữ liệu real-time.</li><li>Lưu lại tên người dùng đã chọn.</li></ul></div><div class="about-section"><button class="contact-button danger" onclick="clearCacheAndReload()">Xóa Cache</button><a href="mailto:tri.vu.trong@inbold.com" class="contact-button">tri.vu.trong@inbold.com</a></div></div></div>
     </div>
 
     <script>
         class FoodMenuApp {
             constructor() {
-                // Config -- ĐÃ ĐIỀN SẴN KEY CỦA BẠN
-                this.SHEET_ID = '1yTZxJfVgrLc4HgGskvxP_o-bfrn8hB-zOY6D7Z4k644';
-                this.API_KEY = 'AIzaSyA1MbM2yNlW-9XTFmqoLehBiT1AqP8_qdQ';
+                // Config -- HÃY DÁN CÁC KEY BẠN VỪA TẠO MỚI VÀO ĐÂY
+                this.SHEET_ID = '11mnJvKd0T-HPMjO5Rf1B6zAn3cMGbbi9dcfWevCUB9g'; // Giữ nguyên
+                this.API_KEY = 'AIzaSyDypKkzhsZ_aai6YozkoP4cywXSW1z_vvc'; // Lấy từ Bước 2
                 this.SHEET_NAME = 'Sheet1';
-                this.APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyrg5lexvH1UPKQsn_w4fF-pfUxHajD8Cy18oZrw45jrKCNnB6IufKFk4JMnGv2Ya4/exec';
+                this.APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxbkhF6r93lotnfraQCwiYxqLMnTUl-37JT3YgSwN-3qxuAejb1WdREokZNkQfsTka1/exec'; // Lấy từ Bước 3
                 
-                // Đổi key để xóa cache cũ
-                this.CACHE_KEY = 'food_menu_data_v7';
+                this.CACHE_KEY = 'food_menu_fresh_start_v1';
                 
-                // UI Elements
+                // --- CÁC PHẦN CÒN LẠI CỦA CODE GIỮ NGUYÊN ---
                 this.loadingOverlay = document.getElementById('loading-overlay');
                 this.loadingText = document.getElementById('loading-text');
                 this.menuTab = document.getElementById('menu-tab');
@@ -245,53 +104,38 @@
                 this.menuMode = document.getElementById('menu-mode');
                 this.todayMode = document.getElementById('today-mode');
                 this.aboutMode = document.getElementById('about-mode');
-                
-                // Today Mode
                 this.dishName = document.getElementById('dish-name');
                 this.eatenButton = document.getElementById('eaten-button');
                 this.userSelect = document.getElementById('user-select');
                 this.todayGreeting = document.getElementById('today-greeting');
-
-                // Menu Mode
                 this.menuTable = document.getElementById('menu-table');
                 this.menuSearchInput = document.getElementById('menu-search-input');
                 this.shiftFilterBtn = document.getElementById('shift-filter-btn');
-
-                // State
                 this.allUsersData = [];
                 this.currentMode = 'today';
-                this.selectedUser = null; // Object
+                this.selectedUser = null; 
                 this.updateInterval = null;
                 this.shiftFilters = ['all', 'day', 'evening'];
-                this.currentShiftFilterIndex = 0; // 'all'
+                this.currentShiftFilterIndex = 0;
                 this.shiftIcons = ['😂', '☀️', '🌙'];
-                
                 this.initEventListeners();
                 this.init();
             }
-
-            // --- DATA & API METHODS ---
 
             async fetchData() {
                 const readUrl = `https://sheets.googleapis.com/v4/spreadsheets/${this.SHEET_ID}/values/${this.SHEET_NAME}?key=${this.API_KEY}`;
                 try {
                     const response = await fetch(readUrl);
                     if (!response.ok) throw new Error(`Google Sheets API error: ${response.status}`);
-                    
                     const data = await response.json();
                     if (!data.values || data.values.length < 2) throw new Error('No data found in sheet');
-
                     const headers = data.values[0];
                     const rows = data.values.slice(1);
-                    
                     this.allUsersData = rows.map(row => {
                         const user = {};
-                        headers.forEach((header, index) => {
-                            user[header] = row[index] || '';
-                        });
+                        headers.forEach((header, index) => { user[header] = row[index] || ''; });
                         return user;
-                    }).filter(user => user['Tên'] && user['Tên'].trim() !== ''); // Lọc người dùng có tên
-                    
+                    }).filter(user => user['Tên'] && user['Tên'].trim() !== '');
                     localStorage.setItem(this.CACHE_KEY, JSON.stringify(this.allUsersData));
                     console.log(`Loaded ${this.allUsersData.length} users from Google Sheets`);
                 } catch (error) {
@@ -307,9 +151,6 @@
             }
 
             async updateEatenStatus(userName, isEaten) {
-                if (!this.APPS_SCRIPT_URL.startsWith('https')) {
-                    throw new Error('URL Apps Script không hợp lệ. Vui lòng kiểm tra lại.');
-                }
                 try {
                     const response = await fetch(this.APPS_SCRIPT_URL, {
                         method: 'POST',
@@ -317,11 +158,12 @@
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({ userName, isEaten })
                     });
-                    
-                    const result = await response.json();
-                    if (result.status !== 'success') {
-                        throw new Error(result.message);
+                    if (!response.ok) {
+                         const errorText = await response.text();
+                         throw new Error(`Server responded with status ${response.status}: ${errorText}`);
                     }
+                    const result = await response.json();
+                    if (result.status !== 'success') { throw new Error(result.message); }
                     return true;
                 } catch (error) {
                     console.error('Failed to update eaten status via Apps Script:', error);
@@ -329,13 +171,10 @@
                 }
             }
             
-            // --- INITIALIZATION ---
-
             initEventListeners() {
                 this.menuTab.addEventListener('click', () => this.switchMode('menu'));
                 this.todayTab.addEventListener('click', () => this.switchMode('today'));
                 this.aboutTab.addEventListener('click', () => this.switchMode('about'));
-                
                 this.menuSearchInput.addEventListener('input', () => this.renderMenuTable());
                 this.shiftFilterBtn.addEventListener('click', () => this.toggleShiftFilter());
                 this.userSelect.addEventListener('change', (e) => this.handleUserSelection(e.target.value));
@@ -345,10 +184,8 @@
                 try {
                     this.updateLoadingText('Đang tải dữ liệu...');
                     await this.fetchData();
-                    
                     this.populateUserSelect();
                     this.loadSavedUser();
-                    
                     this.updateTodayView();
                     this.startPeriodicUpdates();
                     this.hideLoading();
@@ -358,30 +195,24 @@
                 }
             }
 
-            // --- UI & LOGIC ---
-
             switchMode(mode) {
                 this.currentMode = mode;
-                
                 document.querySelectorAll('.toggle-button').forEach(btn => btn.classList.remove('active'));
                 document.getElementById(`${mode}-tab`).classList.add('active');
-
                 document.querySelectorAll('.today-mode, .menu-mode, .about-mode').forEach(m => m.classList.remove('active'));
                 document.getElementById(`${mode}-mode`).classList.add('active');
-                
-                if (mode === 'menu') {
-                    this.renderMenuTable();
-                }
+                if (mode === 'menu') { this.renderMenuTable(); }
             }
 
             populateUserSelect() {
                 this.userSelect.innerHTML = '<option value="">-- Chọn tên của bạn --</option>';
                 this.allUsersData
-                    .sort((a, b) => a['Tên'].localeCompare(b['Tên']))
+                    .sort((a, b) => (a['Tên'] || '').localeCompare(b['Tên'] || ''))
                     .forEach(user => {
                         const option = document.createElement('option');
-                        option.value = user['Tên'].replace("• ", "");
-                        option.textContent = user['Tên'].replace("• ", "");
+                        const userName = user['Tên'] ? user['Tên'].replace("• ", "") : '';
+                        option.value = userName;
+                        option.textContent = userName;
                         this.userSelect.appendChild(option);
                     });
             }
@@ -396,7 +227,7 @@
             
             handleUserSelection(userName) {
                 if (userName) {
-                    this.selectedUser = this.allUsersData.find(u => u['Tên'].replace("• ", "") === userName) || null;
+                    this.selectedUser = this.allUsersData.find(u => u['Tên'] && u['Tên'].replace("• ", "") === userName) || null;
                     localStorage.setItem('selected_user', userName);
                 } else {
                     this.selectedUser = null;
@@ -409,7 +240,6 @@
                 const today = new Date().getDay();
                 const dayMapping = ['Chủ Nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
                 const currentDayKey = dayMapping[today] || 'Thứ 2';
-
                 if (this.selectedUser) {
                     const userName = this.selectedUser['Tên'].replace("• ", "");
                     this.todayGreeting.innerHTML = `Chào <span class="user-name">${userName}</span>, hôm nay bạn ăn:`;
@@ -425,44 +255,31 @@
 
             updateEatenButtonState() {
                 if (!this.selectedUser) return;
-
                 const hasEaten = this.hasEatenToday(this.selectedUser);
                 this.eatenButton.disabled = hasEaten;
                 this.eatenButton.textContent = hasEaten ? 'Đã ăn rồi' : 'Đã ăn';
             }
 
             hasEatenToday(user) {
-                return user['Eaten'] && user['Eaten'].trim() !== '' || user['Tên'].startsWith("• ");
+                return (user['Eaten'] && user['Eaten'].trim() !== '') || (user['Tên'] && user['Tên'].startsWith("• "));
             }
 
             async markAsEaten() {
-                if (!this.selectedUser) {
-                    alert('Vui lòng chọn tên của bạn trước.');
-                    return;
-                }
-                
-                const userName = this.selectedUser['Tên'].replace("• ", "");
+                if (!this.selectedUser) { alert('Vui lòng chọn tên của bạn trước.'); return; }
                 this.eatenButton.disabled = true;
                 this.eatenButton.textContent = 'Đang cập nhật...';
-
                 try {
-                    await this.updateEatenStatus(userName, true);
-                    
-                    // Update local data immediately for instant UI feedback
+                    await this.updateEatenStatus(this.selectedUser['Tên'].replace("• ", ""), true);
+                    const userName = this.selectedUser['Tên'].replace("• ", "");
                     this.selectedUser['Eaten'] = new Date().toISOString();
                     this.selectedUser['Tên'] = "• " + userName;
                     this.eatenButton.textContent = 'Đã ăn rồi';
-
-                    // Refresh menu table if visible
-                    if (this.currentMode === 'menu') this.renderMenuTable();
-
+                    if (this.currentMode === 'menu') { this.renderMenuTable(); }
                 } catch (error) {
                     alert(`Không thể cập nhật: ${error.message}. Vui lòng thử lại.`);
-                    this.updateEatenButtonState(); // Revert button state on failure
+                    this.updateEatenButtonState();
                 }
             }
-
-            // --- MENU MODE ---
             
             toggleShiftFilter() {
                 this.currentShiftFilterIndex = (this.currentShiftFilterIndex + 1) % this.shiftFilters.length;
@@ -474,20 +291,11 @@
             getFilteredMenuData() {
                 const searchQuery = this.menuSearchInput.value.toLowerCase().trim();
                 const currentShift = this.shiftFilters[this.currentShiftFilterIndex];
-
-                const shiftMap = {
-                    'day': 'Ca sáng / Day shift',
-                    'evening': 'Ca chiều / Evening shift'
-                };
-
+                const shiftMap = {'day': 'Ca sáng / Day shift', 'evening': 'Ca chiều / Evening shift'};
                 return this.allUsersData.filter(user => {
-                    // Filter by shift
-                    if (currentShift !== 'all' && user['Ca'] !== shiftMap[currentShift]) {
-                        return false;
-                    }
-                    // Filter by search query
+                    if (currentShift !== 'all' && user['Ca'] !== shiftMap[currentShift]) return false;
                     if (searchQuery) {
-                        const name = user['Tên'].replace("• ", "").toLowerCase();
+                        const name = (user['Tên'] || '').replace("• ", "").toLowerCase();
                         const unsignedName = this.removeDiacritics(name);
                         return name.includes(searchQuery) || unsignedName.includes(searchQuery);
                     }
@@ -497,81 +305,53 @@
 
             renderMenuTable() {
                 const filteredData = this.getFilteredMenuData();
-                
                 if (filteredData.length === 0) {
                     this.menuTable.innerHTML = '<thead><tr><th colspan="3" style="text-align: center; padding: 40px; color: #64748b;">Không tìm thấy dữ liệu</th></tr></thead>';
                     return;
                 }
-                
                 const today = new Date().getDay();
                 const dayMapping = ['Chủ Nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
                 const currentDayKey = dayMapping[today] || 'Thứ 2';
-
                 const headerRow = `<th>✓</th><th>Tên</th><th>${currentDayKey}</th>`;
-                
                 const bodyRows = filteredData.map(user => {
                     const hasEaten = this.hasEatenToday(user);
-                    const userName = user['Tên'].replace("• ", "");
-                    return `
-                        <tr class="${hasEaten ? 'eaten-row' : ''}">
-                            <td>
-                                <div class="checkbox-container">
-                                    <input type="checkbox" ${hasEaten ? 'checked' : ''} 
-                                           onchange="handleCheckboxChange('${userName}', this.checked)">
-                                </div>
-                            </td>
-                            <td>${userName}</td>
-                            <td>${user[currentDayKey] || ''}</td>
-                        </tr>
-                    `;
+                    const userName = user['Tên'] ? user['Tên'].replace("• ", "") : '';
+                    return `<tr class="${hasEaten ? 'eaten-row' : ''}"><td><div class="checkbox-container"><input type="checkbox" ${hasEaten ? 'checked' : ''} onchange="handleCheckboxChange('${userName}', this.checked)"></div></td><td>${userName}</td><td>${user[currentDayKey] || ''}</td></tr>`;
                 }).join('');
-                
                 this.menuTable.innerHTML = `<thead><tr>${headerRow}</tr></thead><tbody>${bodyRows}</tbody>`;
             }
 
             async handleCheckboxChange(userName, isChecked) {
-                const user = this.allUsersData.find(u => u['Tên'].replace("• ", "") === userName);
+                const user = this.allUsersData.find(u => u['Tên'] && u['Tên'].replace("• ", "") === userName);
                 if (!user) return;
-                
                 const row = [...this.menuTable.querySelectorAll('tbody tr')].find(r => r.cells[1].textContent === userName);
-                
                 try {
                     await this.updateEatenStatus(userName, isChecked);
-                    
-                    // Update local data
                     user['Eaten'] = isChecked ? new Date().toISOString() : '';
                     user['Tên'] = isChecked ? "• " + userName : userName;
                     if (row) row.classList.toggle('eaten-row', isChecked);
-                    
-                    // Update today view if the current user is the one being changed
-                    if (this.selectedUser && this.selectedUser['Tên'].replace("• ", "") === userName) {
+                    if (this.selectedUser && (this.selectedUser['Tên'] || '').replace("• ", "") === userName) {
                         this.updateEatenButtonState();
                     }
-
                 } catch (error) {
                     alert(`Không thể cập nhật: ${error.message}. Vui lòng thử lại.`);
-                    // Revert checkbox state on failure
                     const checkbox = row.querySelector('input[type="checkbox"]');
                     if (checkbox) checkbox.checked = !isChecked;
                 }
             }
 
-            // --- UTILITIES ---
-
             startPeriodicUpdates() {
                 this.updateInterval = setInterval(async () => {
                     try {
                         await this.fetchData();
-                        this.populateUserSelect(); // Repopulate to get name updates (•)
-                        
+                        this.populateUserSelect();
                         const currentSelectedValue = this.userSelect.value;
                         if(currentSelectedValue) this.handleUserSelection(currentSelectedValue);
-
                         if (this.currentMode === 'menu') this.renderMenuTable();
                     } catch (error) {
                         console.warn('Periodic update failed:', error);
                     }
-                }, 60000); // Update every 60 seconds
+                }, 60000);
             }
 
             updateLoadingText(text) { this.loadingText.textContent = text; }
@@ -580,20 +360,16 @@
             destroy() { if (this.updateInterval) clearInterval(this.updateInterval); }
         }
         
-        // --- GLOBAL SCOPE ---
         let app;
-        
         function markAsEaten() { app?.markAsEaten(); }
         function handleCheckboxChange(userName, isChecked) { app?.handleCheckboxChange(userName, isChecked); }
-        
         function clearCacheAndReload() {
             if (confirm('Xóa cache sẽ tải lại dữ liệu mới nhất từ Google Sheets. Bạn có chắc chắn?')) {
-                localStorage.removeItem('food_menu_data_v7'); // Đã cập nhật key
+                localStorage.removeItem('food_menu_fresh_start_v1');
                 localStorage.removeItem('selected_user');
                 location.reload();
             }
         }
-        
         document.addEventListener('DOMContentLoaded', () => { app = new FoodMenuApp(); });
         window.addEventListener('beforeunload', () => { app?.destroy(); });
     </script>
