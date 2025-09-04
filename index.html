@@ -930,14 +930,33 @@
             }
             
             hasEatenToday(user) {
-                const eatenTimestamp = user['Eaten'] || user[Object.keys(user)[7]]; // Column H (index 7)
+                // Check multiple possible column names for eaten status
+                const eatenTimestamp = user['Eaten'] || user[Object.keys(this.allUsersData[0] || {})[7]] || user['eaten'] || '';
+                
                 if (!eatenTimestamp) return false;
                 
                 try {
-                    const eatenDate = new Date(eatenTimestamp);
-                    const today = new Date();
-                    return eatenDate.toDateString() === today.toDateString();
-                } catch {
+                    const today = new Date().toDateString();
+                    
+                    // Handle different date formats
+                    let eatenDate;
+                    if (eatenTimestamp.includes('T') || eatenTimestamp.includes('Z')) {
+                        // ISO format
+                        eatenDate = new Date(eatenTimestamp);
+                    } else {
+                        // Vietnamese locale format or other formats
+                        eatenDate = new Date(eatenTimestamp);
+                    }
+                    
+                    if (isNaN(eatenDate.getTime())) {
+                        // If date parsing fails, check if it's today's date string
+                        return eatenTimestamp.includes(today.split(' ')[0]) || 
+                               eatenTimestamp.includes(new Date().toLocaleDateString('vi-VN'));
+                    }
+                    
+                    return eatenDate.toDateString() === today;
+                } catch (error) {
+                    console.warn('Date parsing error:', error);
                     return false;
                 }
             }
