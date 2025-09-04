@@ -8,17 +8,25 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --bg-gradient: linear-gradient(135deg, #1e293b 0%, #334155 25%, #475569 50%, #334155 75%, #1e293b 100%);
+            --text-primary: #e2e8f0;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            --success-gradient: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+            --danger-gradient: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+            --panel-bg: rgba(30, 41, 59, 0.95);
+            --border-color: rgba(148, 163, 184, 0.2);
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #1e293b 0%, #334155 25%, #475569 50%, #334155 75%, #1e293b 100%);
+            background: var(--bg-gradient);
             background-attachment: fixed;
-            color: #e2e8f0;
+            color: var(--text-primary);
             height: 100vh;
             height: 100dvh;
             display: flex;
@@ -30,14 +38,10 @@
             left: 0;
         }
         
-        /* Add animated background pattern */
         body::before {
             content: '';
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background: 
                 radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
                 radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
@@ -46,607 +50,107 @@
             animation: backgroundMove 20s ease-in-out infinite;
         }
         
-        @keyframes backgroundMove {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-        }
+        @keyframes backgroundMove { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
         
-        .app-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
+        .app-container { flex: 1; display: flex; flex-direction: column; padding: 20px; max-width: 1200px; margin: 0 auto; width: 100%; height: 100%; overflow: hidden; }
         
         /* Toggle Header */
-        .toggle-header {
-            display: flex;
-            background: rgba(30, 41, 59, 0.9);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(148, 163, 184, 0.2);
-            border-radius: 20px;
-            padding: 6px;
-            margin-bottom: 40px;
-            align-self: center;
-            box-shadow: 
-                0 20px 25px -5px rgba(0, 0, 0, 0.4),
-                0 10px 10px -5px rgba(0, 0, 0, 0.04),
-                inset 0 1px 0 rgba(148, 163, 184, 0.1);
-            position: relative;
-        }
-        
-        .toggle-button {
-            padding: 14px 28px;
-            background: transparent;
-            border: none;
-            border-radius: 16px;
-            font-size: 16px;
-            font-weight: 600;
-            color: #64748b;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            min-width: 120px;
-            position: relative;
-            z-index: 2;
-        }
-        
-        .toggle-button.active {
-            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-            color: #ffffff;
-            box-shadow: 
-                0 10px 15px -3px rgba(59, 130, 246, 0.3),
-                0 4px 6px -2px rgba(59, 130, 246, 0.2);
-            transform: translateY(-1px);
-        }
-        
-        .toggle-button:hover:not(.active) {
-            background: rgba(30, 41, 59, 0.6);
-            color: #e2e8f0;
-            transform: translateY(-1px);
-        }
+        .toggle-header { display: flex; background: rgba(30, 41, 59, 0.9); backdrop-filter: blur(20px); border: 1px solid var(--border-color); border-radius: 20px; padding: 6px; margin-bottom: 40px; align-self: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(148, 163, 184, 0.1); position: relative; }
+        .toggle-button { padding: 14px 28px; background: transparent; border: none; border-radius: 16px; font-size: 16px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); min-width: 120px; position: relative; z-index: 2; }
+        .toggle-button.active { background: var(--accent-gradient); color: #ffffff; box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3), 0 4px 6px -2px rgba(59, 130, 246, 0.2); transform: translateY(-1px); }
+        .toggle-button:hover:not(.active) { background: rgba(30, 41, 59, 0.6); color: var(--text-primary); transform: translateY(-1px); }
         
         /* Loading Overlay */
-        .loading-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(30, 41, 59, 0.95);
-            backdrop-filter: blur(10px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-        }
-        
-        .loading-text {
-            font-size: 18px;
-            color: #94a3b8;
-            font-weight: 600;
-            text-align: center;
-        }
+        .loading-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; z-index: 100; }
+        .loading-text { font-size: 18px; color: #94a3b8; font-weight: 600; text-align: center; }
         
         /* Today Mode */
-        .today-mode {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 30px;
-            padding: 20px;
-        }
+        .today-mode { flex: 1; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 30px; padding: 20px; }
+        .today-mode.active { display: flex; }
+        .today-content { text-align: center; max-width: 600px; width: 100%; }
+        .today-greeting { font-size: 22px; color: var(--text-secondary); margin-bottom: 8px; font-weight: 500;}
+        .today-greeting .user-name { font-weight: 700; color: #fff; }
+        .today-dish-name { font-size: 40px; font-weight: 800; color: #ffffff; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; min-height: 50px; }
         
-        .today-mode.active {
-            display: flex;
-        }
+        .eaten-button { background: var(--success-gradient); color: #ffffff; font-size: 24px; font-weight: 700; padding: 20px 40px; border: none; border-radius: 24px; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3), 0 4px 6px -2px rgba(16, 185, 129, 0.2); width: 100%; max-width: 400px; }
+        .eaten-button:hover { transform: translateY(-2px); box-shadow: 0 20px 25px -5px rgba(16, 185, 129, 0.4), 0 10px 10px -5px rgba(16, 185, 129, 0.2); }
+        .eaten-button:disabled { background: linear-gradient(135deg, #64748b 0%, #94a3b8 100%); cursor: not-allowed; transform: none; box-shadow: none; }
         
-        .today-dish {
-            background: rgba(30, 41, 59, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(148, 163, 184, 0.2);
-            border-radius: 24px;
-            padding: 40px;
-            text-align: center;
-            box-shadow: 
-                0 25px 50px -12px rgba(0, 0, 0, 0.5),
-                inset 0 1px 0 rgba(148, 163, 184, 0.1);
-            max-width: 700px;
-            width: 100%;
-        }
-        
-        .greeting-text {
-            font-size: 24px;
-            font-weight: 600;
-            color: #cbd5e1;
-            margin-bottom: 20px;
-            line-height: 1.4;
-        }
-        
-        .dish-name {
-            font-size: 32px;
-            font-weight: 800;
-            color: #ffffff;
-            margin-bottom: 30px;
-            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            line-height: 1.3;
-        }
-        
-        .eaten-button {
-            background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
-            color: #ffffff;
-            font-size: 22px;
-            font-weight: 700;
-            padding: 20px 40px;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 
-                0 10px 15px -3px rgba(16, 185, 129, 0.3),
-                0 4px 6px -2px rgba(16, 185, 129, 0.2);
-            min-width: 200px;
-        }
-        
-        .eaten-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 
-                0 20px 25px -5px rgba(16, 185, 129, 0.4),
-                0 10px 10px -5px rgba(16, 185, 129, 0.2);
-        }
-        
-        .eaten-button:disabled {
-            background: linear-gradient(135deg, #64748b 0%, #94a3b8 100%);
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        
-        .simple-user-selector {
-            background: rgba(30, 41, 59, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(148, 163, 184, 0.2);
-            border-radius: 16px;
-            padding: 16px 20px;
-            position: relative;
-            max-width: 250px;
-            width: 100%;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .simple-user-selector:hover {
-            border-color: rgba(59, 130, 246, 0.5);
-        }
-        
-        .selected-user {
-            color: #ffffff;
-            font-size: 16px;
-            font-weight: 600;
-            text-align: center;
-        }
-        
-        .user-dropdown {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: rgba(30, 41, 59, 0.98);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(148, 163, 184, 0.2);
-            border-radius: 12px;
-            margin-top: 8px;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 10;
-            display: none;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-        }
-        
-        .user-dropdown.show {
-            display: block;
-        }
-        
-        .user-option {
-            padding: 12px 16px;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            font-size: 15px;
-            font-weight: 500;
-        }
-        
-        .user-option:hover {
-            background: rgba(59, 130, 246, 0.2);
-        }
+        .user-selector-wrapper { position: relative; max-width: 400px; width: 100%; }
+        .user-selector { width: 100%; padding: 12px 16px; font-size: 16px; border: none; border-radius: 12px; background: transparent; color: var(--text-primary); outline: none; font-weight: 500; appearance: none; cursor: pointer; text-align: center; border-bottom: 2px solid var(--border-color); }
+        .user-selector:focus { border-color: rgba(59, 130, 246, 0.5); }
         
         /* Menu Mode */
-        .menu-mode {
-            flex: 1;
-            display: none;
-            flex-direction: column;
-            padding-top: 20px;
-        }
+        .menu-mode { flex: 1; display: none; flex-direction: column; }
+        .menu-mode.active { display: flex; }
+        .menu-controls { margin-bottom: 24px; display: flex; justify-content: center; align-items: center; gap: 12px; }
+        .menu-search { flex-grow: 1; max-width: 450px; }
+        .menu-search input { width: 100%; padding: 18px 24px; font-size: 16px; border: 2px solid var(--border-color); border-radius: 20px; background: var(--panel-bg); backdrop-filter: blur(20px); color: #ffffff; outline: none; font-weight: 600; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(148, 163, 184, 0.1); }
+        .menu-search input::placeholder { color: var(--text-muted); }
+        .menu-search input:focus { border-color: rgba(59, 130, 246, 0.5); background: rgba(30, 41, 59, 0.95); box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.2), 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .shift-filter-btn { font-size: 24px; background: var(--panel-bg); border: 2px solid var(--border-color); border-radius: 50%; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; }
+        .shift-filter-btn:hover { border-color: rgba(59, 130, 246, 0.5); transform: scale(1.05); }
+
+        .menu-container { background: var(--panel-bg); backdrop-filter: blur(20px); border: 1px solid var(--border-color); border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(148, 163, 184, 0.1); overflow: hidden; height: calc(100vh - 220px); display: flex; flex-direction: column; }
+        .menu-content { flex: 1; overflow-y: auto; }
+        .menu-table { width: 100%; border-collapse: collapse; }
+        .menu-table th { background: rgba(59, 130, 246, 0.1); backdrop-filter: blur(10px); padding: 20px 24px; text-align: left; font-weight: 700; color: #ffffff; border-bottom: 2px solid rgba(148, 163, 184, 0.1); position: sticky; top: 0; z-index: 5; font-size: 16px; }
+        .menu-table th:first-child { width: 60px; text-align: center; }
+        .menu-table td { padding: 18px 24px; border-bottom: 1px solid rgba(148, 163, 184, 0.05); color: var(--text-secondary); font-weight: 500; font-size: 15px; }
+        .menu-table td:first-child { text-align: center; }
+        .menu-table tr { transition: background-color 0.2s ease, opacity 0.3s ease; }
+        .menu-table tr:hover { background: rgba(59, 130, 246, 0.05); }
+        .menu-table tr.eaten-row { opacity: 0.5; }
+        .menu-table tr.eaten-row:hover { opacity: 0.7; }
         
-        .menu-mode.active {
-            display: flex;
-        }
-        
-        .menu-controls {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 24px;
-        }
-        
-        .menu-search {
-            flex: 1;
-            max-width: 400px;
-        }
-        
-        .menu-search input {
-            width: 100%;
-            padding: 18px 24px;
-            font-size: 16px;
-            border: 2px solid rgba(148, 163, 184, 0.2);
-            border-radius: 20px;
-            background: rgba(30, 41, 59, 0.9);
-            backdrop-filter: blur(20px);
-            color: #ffffff;
-            outline: none;
-            font-weight: 600;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 
-                0 4px 6px -1px rgba(0, 0, 0, 0.1),
-                inset 0 1px 0 rgba(148, 163, 184, 0.1);
-        }
-        
-        .menu-search input::placeholder {
-            color: #64748b;
-        }
-        
-        .menu-search input:focus {
-            border-color: rgba(59, 130, 246, 0.5);
-            background: rgba(30, 41, 59, 0.95);
-            box-shadow: 
-                0 10px 15px -3px rgba(59, 130, 246, 0.2),
-                0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-        
-        .shift-filter {
-            background: rgba(30, 41, 59, 0.9);
-            backdrop-filter: blur(20px);
-            border: 2px solid rgba(148, 163, 184, 0.2);
-            border-radius: 20px;
-            padding: 12px 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 60px;
-            height: 60px;
-            font-size: 24px;
-        }
-        
-        .shift-filter:hover {
-            border-color: rgba(59, 130, 246, 0.5);
-            transform: translateY(-1px);
-        }
-        
-        .menu-container {
-            background: rgba(30, 41, 59, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(148, 163, 184, 0.2);
-            border-radius: 24px;
-            box-shadow: 
-                0 25px 50px -12px rgba(0, 0, 0, 0.5),
-                inset 0 1px 0 rgba(148, 163, 184, 0.1);
-            overflow: hidden;
-            height: calc(100vh - 200px);
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .menu-content {
-            flex: 1;
-            overflow-y: auto;
-        }
-        
-        .menu-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        .menu-table th {
-            background: rgba(59, 130, 246, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 20px 24px;
-            text-align: left;
-            font-weight: 700;
-            color: #ffffff;
-            border-bottom: 2px solid rgba(148, 163, 184, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 5;
-            font-size: 16px;
-        }
-        
-        .menu-table th:first-child {
-            width: 60px;
-            text-align: center;
-        }
-        
-        .menu-table td {
-            padding: 18px 24px;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.05);
-            color: #cbd5e1;
-            font-weight: 500;
-            font-size: 15px;
-            transition: opacity 0.3s ease;
-        }
-        
-        .menu-table td:first-child {
-            text-align: center;
-        }
-        
-        .menu-table tr:hover {
-            background: rgba(59, 130, 246, 0.05);
-        }
-        
-        .menu-table tr.eaten {
-            opacity: 0.4;
-        }
-        
-        .checkbox-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .checkbox-container input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            accent-color: #10b981;
-            cursor: pointer;
-        }
+        .checkbox-container input[type="checkbox"] { width: 20px; height: 20px; accent-color: #10b981; cursor: pointer; }
         
         /* About Mode */
-        .about-mode {
-            flex: 1;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            overflow-y: auto;
-        }
+        .about-mode { flex: 1; display: none; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
+        .about-mode.active { display: flex; }
+        .about-container { background: var(--panel-bg); backdrop-filter: blur(20px); border: 1px solid var(--border-color); border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(148, 163, 184, 0.1); padding: 40px; max-width: 550px; width: 100%; }
+        .about-section { margin-bottom: 32px; }
+        .about-section:last-child { margin-bottom: 0; }
+        .about-title { font-size: 24px; font-weight: 800; color: #ffffff; margin-bottom: 20px; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .about-list { list-style: none; padding: 0; }
+        .about-list li { padding: 2px 0 2px 28px; color: var(--text-secondary); font-size: 16px; position: relative; line-height: 1.6; }
+        .about-list li:before { content: "•"; color: #3b82f6; font-weight: bold; position: absolute; left: 0; font-size: 20px; }
+        .contact-button { display: inline-block; background: var(--accent-gradient); color: #ffffff; font-size: 16px; font-weight: 600; padding: 14px 28px; border: none; border-radius: 16px; text-decoration: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3), 0 4px 6px -2px rgba(59, 130, 246, 0.2); cursor: pointer; margin-right: 12px; margin-bottom: 12px; }
+        .contact-button:hover { transform: translateY(-2px); box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.4), 0 10px 10px -5px rgba(59, 130, 246, 0.2); }
+        .contact-button.danger { background: var(--danger-gradient); box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.3), 0 4px 6px -2px rgba(239, 68, 68, 0.2); }
+        .contact-button.danger:hover { box-shadow: 0 20px 25px -5px rgba(239, 68, 68, 0.4), 0 10px 10px -5px rgba(239, 68, 68, 0.2); }
         
-        .about-mode.active {
-            display: flex;
-        }
-        
-        .about-container {
-            background: rgba(30, 41, 59, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(148, 163, 184, 0.2);
-            border-radius: 24px;
-            box-shadow: 
-                0 25px 50px -12px rgba(0, 0, 0, 0.5),
-                inset 0 1px 0 rgba(148, 163, 184, 0.1);
-            padding: 40px;
-            max-width: 550px;
-            width: 100%;
-        }
-        
-        .about-section {
-            margin-bottom: 32px;
-        }
-        
-        .about-section:last-child {
-            margin-bottom: 0;
-        }
-        
-        .about-title {
-            font-size: 24px;
-            font-weight: 800;
-            color: #ffffff;
-            margin-bottom: 20px;
-            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .about-list {
-            list-style: none;
-            padding: 0;
-        }
-        
-        .about-list li {
-            padding: 2px 0;
-            color: #cbd5e1;
-            font-size: 16px;
-            position: relative;
-            padding-left: 28px;
-            line-height: 1.6;
-        }
-        
-        .about-list li:before {
-            content: "•";
-            color: #3b82f6;
-            font-weight: bold;
-            position: absolute;
-            left: 0;
-            font-size: 20px;
-        }
-        
-        .contact-button {
-            display: inline-block;
-            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-            color: #ffffff;
-            font-size: 16px;
-            font-weight: 600;
-            padding: 14px 28px;
-            border: none;
-            border-radius: 16px;
-            text-decoration: none;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 
-                0 10px 15px -3px rgba(59, 130, 246, 0.3),
-                0 4px 6px -2px rgba(59, 130, 246, 0.2);
-            cursor: pointer;
-            margin-right: 12px;
-            margin-bottom: 12px;
-        }
-        
-        .contact-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 
-                0 20px 25px -5px rgba(59, 130, 246, 0.4),
-                0 10px 10px -5px rgba(59, 130, 246, 0.2);
-        }
-        
-        .contact-button.danger {
-            background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
-            box-shadow: 
-                0 10px 15px -3px rgba(239, 68, 68, 0.3),
-                0 4px 6px -2px rgba(239, 68, 68, 0.2);
-        }
-        
-        .contact-button.danger:hover {
-            box-shadow: 
-                0 20px 25px -5px rgba(239, 68, 68, 0.4),
-                0 10px 10px -5px rgba(239, 68, 68, 0.2);
-        }
-        
-        .hidden {
-            display: none !important;
-        }
+        .hidden { display: none !important; }
         
         /* Mobile Responsiveness */
         @media (max-width: 768px) {
-            .app-container {
-                padding: 16px;
-            }
-            
-            .today-dish {
-                padding: 32px 24px;
-            }
-            
-            .dish-name {
-                font-size: 28px;
-            }
-            
-            .greeting-text {
-                font-size: 20px;
-            }
-            
-            .eaten-button {
-                font-size: 18px;
-                padding: 18px 36px;
-            }
-            
-            .toggle-button {
-                font-size: 14px;
-                padding: 12px 24px;
-                min-width: 100px;
-            }
-            
-            .menu-table th,
-            .menu-table td {
-                padding: 16px 20px;
-                font-size: 14px;
-            }
-            
-            .about-container {
-                padding: 32px 24px;
-            }
-            
-            .menu-search input {
-                font-size: 14px;
-                padding: 16px 20px;
-            }
-            
-            .menu-controls {
-                flex-direction: column;
-                gap: 16px;
-            }
-            
-            .menu-search {
-                max-width: 100%;
-            }
+            .app-container { padding: 16px; }
+            .today-greeting { font-size: 18px; }
+            .today-dish-name { font-size: 32px; min-height: 40px; }
+            .eaten-button { font-size: 20px; padding: 18px 32px; }
+            .toggle-button { font-size: 14px; padding: 12px 24px; min-width: 100px; }
+            .menu-table th, .menu-table td { padding: 16px 20px; font-size: 14px; }
+            .about-container { padding: 32px 24px; }
+            .menu-search input { font-size: 14px; padding: 16px 20px; }
+            .shift-filter-btn { width: 50px; height: 50px; font-size: 22px; }
         }
         
         @media (max-width: 480px) {
-            .today-dish {
-                padding: 24px 20px;
-            }
-            
-            .dish-name {
-                font-size: 24px;
-            }
-            
-            .greeting-text {
-                font-size: 18px;
-            }
-            
-            .eaten-button {
-                font-size: 16px;
-                padding: 16px 32px;
-            }
-            
-            .toggle-button {
-                font-size: 13px;
-                padding: 10px 20px;
-                min-width: 80px;
-            }
-            
-            .about-container {
-                padding: 24px 20px;
-                margin: 12px;
-            }
-            
-            .menu-search input {
-                font-size: 14px;
-                padding: 14px 18px;
-            }
-            
-            .toggle-header {
-                margin-bottom: 32px;
-            }
+            .today-greeting { font-size: 16px; }
+            .today-dish-name { font-size: 24px; min-height: 30px; }
+            .eaten-button { font-size: 18px; padding: 16px 28px; }
+            .toggle-button { font-size: 13px; padding: 10px 16px; min-width: 0; }
+            .toggle-header { padding: 4px; }
+            .about-container { padding: 24px 20px; margin: 12px; }
+            .menu-search input { padding: 14px 18px; }
+            .toggle-header { margin-bottom: 32px; }
         }
         
         /* Custom Scrollbar */
-        .menu-content::-webkit-scrollbar,
-        .user-dropdown::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        .menu-content::-webkit-scrollbar-track,
-        .user-dropdown::-webkit-scrollbar-track {
-            background: rgba(148, 163, 184, 0.1);
-            border-radius: 4px;
-        }
-        
-        .menu-content::-webkit-scrollbar-thumb,
-        .user-dropdown::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            border-radius: 4px;
-        }
-        
-        .menu-content::-webkit-scrollbar-thumb:hover,
-        .user-dropdown::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(135deg, #2563eb, #7c3aed);
-        }
+        .menu-content::-webkit-scrollbar { width: 8px; }
+        .menu-content::-webkit-scrollbar-track { background: rgba(148, 163, 184, 0.1); border-radius: 4px; }
+        .menu-content::-webkit-scrollbar-thumb { background: var(--accent-gradient); border-radius: 4px; }
+        .menu-content::-webkit-scrollbar-thumb:hover { background: linear-gradient(135deg, #2563eb, #7c3aed); }
     </style>
 </head>
 <body>
@@ -658,26 +162,27 @@
         
         <!-- Toggle Header -->
         <div class="toggle-header" id="toggle-header">
-            <button class="toggle-button active" id="today-tab" data-mode="today">Today</button>
             <button class="toggle-button" id="menu-tab" data-mode="menu">Menu</button>
+            <button class="toggle-button active" id="today-tab" data-mode="today">Today</button>
             <button class="toggle-button" id="about-tab" data-mode="about">About</button>
         </div>
         
         <!-- Today Mode -->
         <div class="today-mode active" id="today-mode">
-            <div class="simple-user-selector" id="user-selector">
-                <div class="selected-user" id="selected-user">Chọn tên của bạn...</div>
-                <div class="user-dropdown" id="user-dropdown"></div>
-            </div>
-            
-            <div class="today-dish" id="today-dish">
-                <div class="greeting-text" id="greeting-text">Chào bạn, hôm nay bạn ăn:</div>
-                <div class="dish-name" id="dish-name">Đang tải...</div>
+            <div class="today-content">
+                <p class="today-greeting" id="today-greeting">Chào <span class="user-name">bạn</span>,</p>
+                <h2 class="today-dish-name" id="dish-name">Đang tải...</h2>
             </div>
             
             <button class="eaten-button" id="eaten-button" onclick="markAsEaten()">
-                Đã Ăn
+                Đã ăn
             </button>
+            
+            <div class="user-selector-wrapper">
+                <select id="user-select" class="user-selector">
+                    <option value="">-- Chọn tên của bạn --</option>
+                </select>
+            </div>
         </div>
         
         <!-- Menu Mode -->
@@ -686,9 +191,7 @@
                 <div class="menu-search">
                     <input type="text" id="menu-search-input" placeholder="Tìm kiếm tên nhân viên..." autocomplete="off">
                 </div>
-                <div class="shift-filter" id="shift-filter" onclick="toggleShiftFilter()">
-                    ☀️
-                </div>
+                <button class="shift-filter-btn" id="shift-filter-btn" title="Lọc theo ca">😂</button>
             </div>
             <div class="menu-container">
                 <div class="menu-content">
@@ -705,13 +208,12 @@
                 <div class="about-section">
                     <h3 class="about-title">Features:</h3>
                     <ul class="about-list">
-                        <li>Xem món ăn theo thứ trong tuần và ca làm việc.</li>
-                        <li>Đánh dấu đã ăn cho từng người.</li>
-                        <li>Tìm kiếm thông tin nhân viên theo ca.</li>
+                        <li>Xem món ăn hôm nay theo thứ trong tuần.</li>
+                        <li>Đánh dấu và bỏ đánh dấu đã ăn cho từng người.</li>
+                        <li>Tìm kiếm và lọc nhân viên theo ca làm việc.</li>
                         <li>Hiển thị menu theo ngày trong tuần.</li>
                         <li>Tích hợp Google Sheets để cập nhật dữ liệu real-time.</li>
-                        <li>Tự động lưu trữ người dùng đã chọn.</li>
-                        <li>Hỗ trợ ca sáng và ca chiều.</li>
+                        <li>Lưu lại tên người dùng đã chọn.</li>
                     </ul>
                 </div>
                 <div class="about-section">
@@ -722,899 +224,376 @@
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script>
         class FoodMenuApp {
             constructor() {
-                // Toggle elements
+                // Config
+                this.SHEET_ID = '18Jp4hEfndh5E412VoNzai49_7P5K6gU_Ki0x5JnMueE';
+                this.API_KEY = 'AIzaSyD_uigMIB6uaqfr-nKfBTxYdmG8zOXT5_Y'; // Chỉ dùng để đọc
+                this.SHEET_NAME = 'Sheet1';
+                this.APPS_SCRIPT_URL = 'URL_APPS_SCRIPT_CUA_BAN_O_DAY'; // <-- !!! THAY URL CỦA BẠN VÀO ĐÂY !!!
+                this.CACHE_KEY = 'food_menu_data_v4';
+                
+                // UI Elements
+                this.loadingOverlay = document.getElementById('loading-overlay');
+                this.loadingText = document.getElementById('loading-text');
                 this.menuTab = document.getElementById('menu-tab');
                 this.todayTab = document.getElementById('today-tab');
                 this.aboutTab = document.getElementById('about-tab');
                 this.menuMode = document.getElementById('menu-mode');
                 this.todayMode = document.getElementById('today-mode');
                 this.aboutMode = document.getElementById('about-mode');
+                
+                // Today Mode
+                this.dishName = document.getElementById('dish-name');
+                this.eatenButton = document.getElementById('eaten-button');
+                this.userSelect = document.getElementById('user-select');
+                this.todayGreeting = document.getElementById('today-greeting');
+
+                // Menu Mode
                 this.menuTable = document.getElementById('menu-table');
                 this.menuSearchInput = document.getElementById('menu-search-input');
-                this.shiftFilter = document.getElementById('shift-filter');
-                this.loadingOverlay = document.getElementById('loading-overlay');
-                this.loadingText = document.getElementById('loading-text');
-                
-                // Today mode elements
-                this.dishName = document.getElementById('dish-name');
-                this.greetingText = document.getElementById('greeting-text');
-                this.eatenButton = document.getElementById('eaten-button');
-                this.userSelector = document.getElementById('user-selector');
-                this.selectedUser = document.getElementById('selected-user');
-                this.userDropdown = document.getElementById('user-dropdown');
-                
+                this.shiftFilterBtn = document.getElementById('shift-filter-btn');
+
+                // State
                 this.allUsersData = [];
                 this.currentMode = 'today';
-                this.allMenuData = [];
-                this.filteredMenuData = [];
-                this.selectedUserName = this.getStoredUser();
-                this.currentShiftFilter = 'day'; // 'day', 'evening', 'all'
+                this.selectedUser = null; // Object
                 this.updateInterval = null;
-                
-                // Cache configuration
-                this.CACHE_VERSION = '4.0';
-                this.CACHE_EXPIRY = 7 * 24 * 60 * 60 * 1000; // 7 days
-                
-                // Google Sheets configuration - Using OAuth 2.0 approach
-                this.SHEET_ID = '18Jp4hEfndh5E412VoNzai49_7P5K6gU_Ki0x5JnMueE';
-                this.CLIENT_ID = '722653039614-fmtfpd9l8c1t4f8cb5tahda8ujcl2rhq.apps.googleusercontent.com';
-                this.DISCOVERY_DOC = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
-                this.SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
-                this.SHEET_NAME = 'Sheet1';
-                
-                // Initialize OAuth
-                this.isGapiLoaded = false;
-                this.isGisLoaded = false;
-                this.tokenClient = null;
+                this.shiftFilters = ['all', 'day', 'evening'];
+                this.currentShiftFilterIndex = 0; // 'all'
+                this.shiftIcons = ['😂', '☀️', '🌙'];
                 
                 this.initEventListeners();
-                this.loadGoogleAPIs();
+                this.init();
             }
-            
-            // OAuth 2.0 methods
-            async loadGoogleAPIs() {
+
+            // --- DATA & API METHODS ---
+
+            async fetchData() {
+                const readUrl = `https://sheets.googleapis.com/v4/spreadsheets/${this.SHEET_ID}/values/${this.SHEET_NAME}?key=${this.API_KEY}`;
                 try {
-                    await this.loadGapi();
-                    await this.loadGis();
-                    this.init();
-                } catch (error) {
-                    console.error('Failed to load Google APIs:', error);
-                    this.fallbackToReadOnly();
-                }
-            }
-            
-            loadGapi() {
-                return new Promise((resolve, reject) => {
-                    const script = document.createElement('script');
-                    script.src = 'https://apis.google.com/js/api.js';
-                    script.onload = async () => {
-                        await gapi.load('client', async () => {
-                            try {
-                                await gapi.client.init({
-                                    discoveryDocs: [this.DISCOVERY_DOC],
-                                });
-                                this.isGapiLoaded = true;
-                                resolve();
-                            } catch (error) {
-                                reject(error);
-                            }
-                        });
-                    };
-                    script.onerror = reject;
-                    document.head.appendChild(script);
-                });
-            }
-            
-            loadGis() {
-                return new Promise((resolve, reject) => {
-                    const script = document.createElement('script');
-                    script.src = 'https://accounts.google.com/gsi/client';
-                    script.onload = () => {
-                        this.tokenClient = google.accounts.oauth2.initTokenClient({
-                            client_id: this.CLIENT_ID,
-                            scope: this.SCOPES,
-                            callback: (resp) => {
-                                if (resp.error) {
-                                    console.error('OAuth error:', resp.error);
-                                    this.fallbackToReadOnly();
-                                    return;
-                                }
-                                // Access token received
-                                console.log('OAuth token received');
-                            },
-                        });
-                        this.isGisLoaded = true;
-                        resolve();
-                    };
-                    script.onerror = reject;
-                    document.head.appendChild(script);
-                });
-            }
-            
-            async fallbackToReadOnly() {
-                // Fallback to read-only mode with API key
-                this.updateLoadingText('Đang chuyển sang chế độ chỉ đọc...');
-                this.API_KEY = 'AIzaSyD_uigMIB6uaqfr-nKfBTxYdmG8zOXT5_Y';
-                this.readOnlyMode = true;
-                await this.init();
-            }
-            
-            // Cache management methods
-            getCacheKey(key) {
-                return `food_menu_${this.CACHE_VERSION}_${key}`;
-            }
-            
-            setCache(key, data) {
-                try {
-                    const cacheData = {
-                        data: data,
-                        timestamp: Date.now(),
-                        version: this.CACHE_VERSION
-                    };
-                    localStorage.setItem(this.getCacheKey(key), JSON.stringify(cacheData));
-                } catch (error) {
-                    console.warn('Cache write failed:', error);
-                }
-            }
-            
-            getCache(key) {
-                try {
-                    const cached = localStorage.getItem(this.getCacheKey(key));
-                    if (!cached) return null;
-                    
-                    const cacheData = JSON.parse(cached);
-                    const isExpired = Date.now() - cacheData.timestamp > this.CACHE_EXPIRY;
-                    const isOldVersion = cacheData.version !== this.CACHE_VERSION;
-                    
-                    if (isExpired || isOldVersion) {
-                        localStorage.removeItem(this.getCacheKey(key));
-                        return null;
-                    }
-                    
-                    return cacheData.data;
-                } catch (error) {
-                    console.warn('Cache read failed:', error);
-                    return null;
-                }
-            }
-            
-            clearCache() {
-                try {
-                    Object.keys(localStorage).forEach(key => {
-                        if (key.startsWith('food_menu_')) {
-                            localStorage.removeItem(key);
-                        }
-                    });
-                } catch (error) {
-                    console.warn('Cache clear failed:', error);
-                }
-            }
-            
-            // User storage methods
-            getStoredUser() {
-                try {
-                    return localStorage.getItem('food_menu_selected_user') || '';
-                } catch (error) {
-                    return '';
-                }
-            }
-            
-            setStoredUser(userName) {
-                try {
-                    localStorage.setItem('food_menu_selected_user', userName);
-                } catch (error) {
-                    console.warn('Failed to store user:', error);
-                }
-            }
-            
-            // Google Sheets API methods
-            async loadUserDataFromGoogleSheets() {
-                if (this.readOnlyMode) {
-                    return await this.loadUserDataReadOnly();
-                }
-                
-                try {
-                    if (!this.isGapiLoaded) {
-                        throw new Error('GAPI not loaded');
-                    }
-                    
-                    const response = await gapi.client.sheets.spreadsheets.values.get({
-                        spreadsheetId: this.SHEET_ID,
-                        range: this.SHEET_NAME,
-                    });
-                    
-                    const data = response.result;
-                    
-                    if (!data.values || data.values.length === 0) {
-                        throw new Error('No data found in Google Sheets');
-                    }
-                    
-                    // Convert to object format
-                    const headers = data.values[0];
-                    const rows = data.values.slice(1);
-                    
-                    this.allUsersData = rows.map(row => {
-                        const obj = {};
-                        headers.forEach((header, index) => {
-                            obj[header] = row[index] || '';
-                        });
-                        return obj;
-                    });
-                    
-                    console.log(`Loaded ${this.allUsersData.length} users from Google Sheets`);
-                    return this.allUsersData;
-                    
-                } catch (error) {
-                    console.error('Failed to load from Google Sheets:', error);
-                    return await this.loadUserDataReadOnly();
-                }
-            }
-            
-            async loadUserDataReadOnly() {
-                const url = `https://sheets.googleapis.com/v4/spreadsheets/${this.SHEET_ID}/values/${this.SHEET_NAME}?key=${this.API_KEY}`;
-                
-                try {
-                    const response = await fetch(url);
-                    if (!response.ok) {
-                        throw new Error(`Google Sheets API error: ${response.status} - ${response.statusText}`);
-                    }
+                    const response = await fetch(readUrl);
+                    if (!response.ok) throw new Error(`Google Sheets API error: ${response.status}`);
                     
                     const data = await response.json();
-                    
-                    if (!data.values || data.values.length === 0) {
-                        throw new Error('No data found in Google Sheets');
-                    }
-                    
-                    // Convert to object format
+                    if (!data.values || data.values.length < 2) throw new Error('No data found in sheet');
+
                     const headers = data.values[0];
                     const rows = data.values.slice(1);
                     
                     this.allUsersData = rows.map(row => {
-                        const obj = {};
+                        const user = {};
                         headers.forEach((header, index) => {
-                            obj[header] = row[index] || '';
+                            user[header] = row[index] || '';
                         });
-                        return obj;
-                    });
+                        return user;
+                    }).filter(user => user['Tên'] && user['Tên'].trim() !== ''); // Lọc người dùng có tên
                     
-                    console.log(`Loaded ${this.allUsersData.length} users from Google Sheets (read-only)`);
-                    return this.allUsersData;
-                    
+                    localStorage.setItem(this.CACHE_KEY, JSON.stringify(this.allUsersData));
+                    console.log(`Loaded ${this.allUsersData.length} users from Google Sheets`);
                 } catch (error) {
                     console.error('Failed to load from Google Sheets:', error);
-                    throw new Error(`Không thể tải dữ liệu: ${error.message}`);
+                    const cachedData = localStorage.getItem(this.CACHE_KEY);
+                    if (cachedData) {
+                        this.allUsersData = JSON.parse(cachedData);
+                        console.warn('Loaded data from cache due to API error.');
+                    } else {
+                        throw new Error(`Không thể tải dữ liệu: ${error.message}`);
+                    }
                 }
             }
-            
-            async updateEatenStatus(userName) {
-                if (this.readOnlyMode) {
-                    // Simulate update in read-only mode
-                    this.updateLocalEatenStatus(userName);
-                    return true;
+
+            async updateEatenStatus(userName, isEaten) {
+                if (!this.APPS_SCRIPT_URL.startsWith('https')) {
+                    throw new Error('URL Apps Script không hợp lệ. Vui lòng kiểm tra lại.');
                 }
-                
                 try {
-                    // Request access token if needed
-                    if (!gapi.client.getToken()) {
-                        await new Promise((resolve, reject) => {
-                            this.tokenClient.callback = (resp) => {
-                                if (resp.error) {
-                                    reject(new Error(resp.error));
-                                    return;
-                                }
-                                resolve();
-                            };
-                            this.tokenClient.requestAccessToken();
-                        });
-                    }
-                    
-                    // Find the row number for the user
-                    const nameColumn = this.findNameColumn();
-                    const userIndex = this.allUsersData.findIndex(user => 
-                        user[nameColumn] === userName
-                    );
-                    
-                    if (userIndex === -1) {
-                        throw new Error('User not found');
-                    }
-                    
-                    // Row number in Google Sheets (adding 2 because of 0-based index and header row)
-                    const rowNumber = userIndex + 2;
-                    
-                    // Get current name and add bullet point
-                    const currentName = this.allUsersData[userIndex][nameColumn];
-                    const updatedName = currentName.startsWith('• ') ? currentName : `• ${currentName}`;
-                    
-                    // Update name with bullet point in column B
-                    const range = `${this.SHEET_NAME}!B${rowNumber}`;
-                    
-                    const response = await gapi.client.sheets.spreadsheets.values.update({
-                        spreadsheetId: this.SHEET_ID,
-                        range: range,
-                        valueInputOption: 'RAW',
-                        resource: {
-                            values: [[updatedName]]
-                        }
+                    const response = await fetch(this.APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'cors',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ userName, isEaten })
                     });
                     
-                    if (!response.result) {
-                        throw new Error('Failed to update sheet');
+                    const result = await response.json();
+                    if (result.status !== 'success') {
+                        throw new Error(result.message);
                     }
-                    
-                    // Update local data
-                    this.allUsersData[userIndex][nameColumn] = updatedName;
-                    
                     return true;
                 } catch (error) {
-                    console.error('Failed to update eaten status:', error);
-                    // Fallback to local update
-                    this.updateLocalEatenStatus(userName);
+                    console.error('Failed to update eaten status via Apps Script:', error);
                     throw error;
                 }
             }
             
-            updateLocalEatenStatus(userName) {
-                // Update local data only
-                const nameColumn = this.findNameColumn();
-                const userIndex = this.allUsersData.findIndex(user => 
-                    user[nameColumn] === userName
-                );
-                
-                if (userIndex !== -1) {
-                    const currentName = this.allUsersData[userIndex][nameColumn];
-                    const updatedName = currentName.startsWith('• ') ? currentName : `• ${currentName}`;
-                    this.allUsersData[userIndex][nameColumn] = updatedName;
-                    this.allUsersData[userIndex]._localUpdate = Date.now();
-                }
-            }
-            
+            // --- INITIALIZATION ---
+
             initEventListeners() {
-                // Toggle tabs
                 this.menuTab.addEventListener('click', () => this.switchMode('menu'));
                 this.todayTab.addEventListener('click', () => this.switchMode('today'));
                 this.aboutTab.addEventListener('click', () => this.switchMode('about'));
                 
-                // Menu search
-                this.menuSearchInput.addEventListener('input', (e) => this.handleMenuSearch(e));
-                
-                // User selector
-                this.userSelector.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    this.toggleUserDropdown();
-                });
-                
-                // Close dropdown when clicking outside
-                document.addEventListener('click', () => {
-                    this.userDropdown.classList.remove('show');
-                });
+                this.menuSearchInput.addEventListener('input', () => this.renderMenuTable());
+                this.shiftFilterBtn.addEventListener('click', () => this.toggleShiftFilter());
+                this.userSelect.addEventListener('change', (e) => this.handleUserSelection(e.target.value));
             }
-            
+
             async init() {
                 try {
-                    this.updateLoadingText('Đang tải dữ liệu từ Google Sheets...');
-                    await this.loadUserDataFromGoogleSheets();
+                    this.updateLoadingText('Đang tải dữ liệu...');
+                    await this.fetchData();
                     
-                    // Populate user dropdown
-                    this.populateUserDropdown();
+                    this.populateUserSelect();
+                    this.loadSavedUser();
                     
-                    // Set stored user if available
-                    if (this.selectedUserName) {
-                        this.setSelectedUser(this.selectedUserName);
-                    }
-                    
-                    // Load today's dish
-                    this.loadTodayDish();
-                    
-                    // Prepare menu data
-                    this.prepareMenuData();
-                    
-                    // Start periodic updates
+                    this.updateTodayView();
                     this.startPeriodicUpdates();
-                    
                     this.hideLoading();
-                    
                 } catch (error) {
-                    this.updateLoadingText(`Lỗi: ${error.message}`);
+                    this.updateLoadingText(`Lỗi: ${error.message}. Vui lòng thử xóa cache.`);
                     console.error('Init error:', error);
-                    
-                    // Try to recover by clearing cache
-                    setTimeout(() => {
-                        this.updateLoadingText('Đang xóa cache và thử lại...');
-                        this.clearCache();
-                        setTimeout(() => location.reload(), 2000);
-                    }, 3000);
                 }
             }
-            
-            updateLoadingText(text) {
-                this.loadingText.textContent = text;
-            }
-            
-            hideLoading() {
-                this.loadingOverlay.classList.add('hidden');
-            }
-            
-            populateUserDropdown() {
-                const nameColumn = this.findNameColumn();
-                const users = this.allUsersData.filter(user => {
-                    const name = user[nameColumn] && user[nameColumn].trim() !== '';
-                    return name;
-                });
-                
-                // Clear existing dropdown
-                this.userDropdown.innerHTML = '';
-                
-                users.forEach(user => {
-                    const option = document.createElement('div');
-                    option.className = 'user-option';
-                    const displayName = user[nameColumn].replace('• ', ''); // Remove bullet for display
-                    option.textContent = displayName;
-                    option.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        this.setSelectedUser(displayName);
-                        this.userDropdown.classList.remove('show');
-                    });
-                    this.userDropdown.appendChild(option);
-                });
-            }
-            
-            setSelectedUser(userName) {
-                this.selectedUserName = userName;
-                this.selectedUser.textContent = userName;
-                this.setStoredUser(userName);
-                this.updateGreetingText();
-                this.updateEatenButtonState();
-            }
-            
-            toggleUserDropdown() {
-                this.userDropdown.classList.toggle('show');
-            }
-            
-            updateGreetingText() {
-                if (this.selectedUserName) {
-                    this.greetingText.textContent = `Chào ${this.selectedUserName}, hôm nay bạn ăn:`;
-                } else {
-                    this.greetingText.textContent = 'Chào bạn, hôm nay bạn ăn:';
-                }
-            }
-            
-            loadTodayDish() {
-                const today = new Date().getDay();
-                const dayMapping = ['Chủ Nhật', 'Thứ2', 'Thứ3', 'Thứ4', 'Thứ5', 'Thứ6', 'Thứ7'];
-                const currentDayKey = (today >= 1 && today <= 6) ? dayMapping[today] : 'Thứ2';
-                
-                // Get today's dish from user's data or first available
-                let todayDish = 'Không có thông tin món ăn hôm nay';
-                
-                if (this.selectedUserName) {
-                    const nameColumn = this.findNameColumn();
-                    const user = this.allUsersData.find(u => 
-                        u[nameColumn].replace('• ', '') === this.selectedUserName
-                    );
-                    if (user && user[currentDayKey]) {
-                        todayDish = user[currentDayKey];
-                    }
-                } else if (this.allUsersData.length > 0 && this.allUsersData[0][currentDayKey]) {
-                    todayDish = this.allUsersData[0][currentDayKey];
-                }
-                
-                this.dishName.textContent = todayDish;
-            }
-            
-            updateEatenButtonState() {
-                if (!this.selectedUserName) {
-                    this.eatenButton.disabled = true;
-                    this.eatenButton.textContent = 'Đã Ăn';
-                    return;
-                }
-                
-                const nameColumn = this.findNameColumn();
-                const user = this.allUsersData.find(u => 
-                    u[nameColumn].replace('• ', '') === this.selectedUserName
-                );
-                
-                if (user && user[nameColumn].startsWith('• ')) {
-                    this.eatenButton.disabled = true;
-                    this.eatenButton.textContent = 'Đã Ăn Rồi';
-                } else {
-                    this.eatenButton.disabled = false;
-                    this.eatenButton.textContent = 'Đã Ăn';
-                }
-            }
-            
-            async markAsEaten() {
-                if (!this.selectedUserName) {
-                    alert('Vui lòng chọn tên của bạn trước');
-                    return;
-                }
-                
-                try {
-                    this.eatenButton.disabled = true;
-                    this.eatenButton.textContent = 'Đang cập nhật...';
-                    
-                    await this.updateEatenStatus(this.selectedUserName);
-                    
-                    this.eatenButton.textContent = 'Đã Ăn Rồi';
-                    
-                    // Update dropdown and menu table if visible
-                    this.populateUserDropdown();
-                    if (this.currentMode === 'menu') {
-                        this.prepareMenuData();
-                        this.renderMenuTable();
-                    }
-                    
-                } catch (error) {
-                    console.error('Failed to mark as eaten:', error);
-                    if (this.readOnlyMode) {
-                        this.eatenButton.textContent = 'Đã Ăn Rồi (Local)';
-                        this.populateUserDropdown();
-                        if (this.currentMode === 'menu') {
-                            this.prepareMenuData();
-                            this.renderMenuTable();
-                        }
-                    } else {
-                        alert('Không thể cập nhật trạng thái. Vui lòng thử lại.');
-                        this.updateEatenButtonState();
-                    }
-                }
-            }
-            
+
+            // --- UI & LOGIC ---
+
             switchMode(mode) {
                 this.currentMode = mode;
                 
-                // Update active tab
-                this.menuTab.classList.toggle('active', mode === 'menu');
-                this.todayTab.classList.toggle('active', mode === 'today');
-                this.aboutTab.classList.toggle('active', mode === 'about');
-                
-                // Show/hide modes
-                this.menuMode.classList.toggle('active', mode === 'menu');
-                this.todayMode.classList.toggle('active', mode === 'today');
-                this.aboutMode.classList.toggle('active', mode === 'about');
+                document.querySelectorAll('.toggle-button').forEach(btn => btn.classList.remove('active'));
+                document.getElementById(`${mode}-tab`).classList.add('active');
+
+                document.querySelectorAll('.today-mode, .menu-mode, .about-mode').forEach(m => m.classList.remove('active'));
+                document.getElementById(`${mode}-mode`).classList.add('active');
                 
                 if (mode === 'menu') {
                     this.renderMenuTable();
                 }
             }
-            
-            toggleShiftFilter() {
-                const filters = ['day', 'evening', 'all'];
-                const icons = ['☀️', '🌙⭐', '😊'];
-                
-                const currentIndex = filters.indexOf(this.currentShiftFilter);
-                const nextIndex = (currentIndex + 1) % filters.length;
-                
-                this.currentShiftFilter = filters[nextIndex];
-                this.shiftFilter.textContent = icons[nextIndex];
-                
-                this.prepareMenuData();
-                this.renderMenuTable();
-            }
-            
-            prepareMenuData() {
-                const nameColumn = this.findNameColumn();
-                const shiftColumn = 'Ca'; // Column A
-                const today = new Date().getDay();
-                const dayMapping = ['Chủ Nhật', 'Thứ2', 'Thứ3', 'Thứ4', 'Thứ5', 'Thứ6', 'Thứ7'];
-                const currentDayKey = (today >= 1 && today <= 6) ? dayMapping[today] : 'Thứ2';
-                
-                // Filter by shift
-                let filteredUsers = this.allUsersData.filter(user => {
-                    const name = user[nameColumn] && user[nameColumn].trim() !== '';
-                    if (!name) return false;
-                    
-                    if (this.currentShiftFilter === 'all') return true;
-                    
-                    const shift = user[shiftColumn] || '';
-                    if (this.currentShiftFilter === 'day') {
-                        return shift.includes('Ca sáng') || shift.includes('Day shift');
-                    } else if (this.currentShiftFilter === 'evening') {
-                        return shift.includes('Ca chiều') || shift.includes('Evening shift');
-                    }
-                    
-                    return true;
-                });
-                
-                // Store filtered data with name, current day, and eaten status
-                this.allMenuData = filteredUsers.map(user => ({
-                    [nameColumn]: user[nameColumn] || '',
-                    [currentDayKey]: user[currentDayKey] || '',
-                    [shiftColumn]: user[shiftColumn] || '',
-                    eaten: user[nameColumn].startsWith('• ')
-                }));
-                
-                this.filteredMenuData = [...this.allMenuData];
-            }
-            
-            handleMenuSearch(e) {
-                const query = e.target.value.toLowerCase().trim();
-                const nameColumn = this.findNameColumn();
-                
-                if (query === '') {
-                    this.filteredMenuData = [...this.allMenuData];
-                } else {
-                    this.filteredMenuData = this.allMenuData.filter(user => {
-                        const name = user[nameColumn] || '';
-                        const cleanName = name.replace('• ', '');
-                        return cleanName.toLowerCase().includes(query) || 
-                               this.removeDiacritics(cleanName).toLowerCase().includes(query);
+
+            populateUserSelect() {
+                this.userSelect.innerHTML = '<option value="">-- Chọn tên của bạn --</option>';
+                this.allUsersData
+                    .sort((a, b) => a['Tên'].localeCompare(b['Tên']))
+                    .forEach(user => {
+                        const option = document.createElement('option');
+                        option.value = user['Tên'].replace("• ", "");
+                        option.textContent = user['Tên'].replace("• ", "");
+                        this.userSelect.appendChild(option);
                     });
-                }
-                
-                this.renderMenuTable();
             }
             
-            renderMenuTable() {
-                if (this.filteredMenuData.length === 0) {
-                    this.menuTable.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #64748b; padding: 40px;">Không tìm thấy dữ liệu</td></tr>';
+            loadSavedUser() {
+                const savedUserName = localStorage.getItem('selected_user');
+                if (savedUserName) {
+                    this.handleUserSelection(savedUserName);
+                    this.userSelect.value = savedUserName;
+                }
+            }
+            
+            handleUserSelection(userName) {
+                if (userName) {
+                    this.selectedUser = this.allUsersData.find(u => u['Tên'].replace("• ", "") === userName) || null;
+                    localStorage.setItem('selected_user', userName);
+                } else {
+                    this.selectedUser = null;
+                    localStorage.removeItem('selected_user');
+                }
+                this.updateTodayView();
+            }
+
+            updateTodayView() {
+                const today = new Date().getDay();
+                const dayMapping = ['Chủ Nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
+                const currentDayKey = dayMapping[today] || 'Thứ 2';
+
+                if (this.selectedUser) {
+                    const userName = this.selectedUser['Tên'].replace("• ", "");
+                    this.todayGreeting.innerHTML = `Chào <span class="user-name">${userName}</span>, hôm nay bạn ăn:`;
+                    this.dishName.textContent = this.selectedUser[currentDayKey] || 'Chưa có thông tin';
+                    this.updateEatenButtonState();
+                } else {
+                    this.todayGreeting.innerHTML = 'Vui lòng chọn tên của bạn';
+                    this.dishName.textContent = 'để xem món ăn hôm nay';
+                    this.eatenButton.disabled = true;
+                    this.eatenButton.textContent = 'Đã ăn';
+                }
+            }
+
+            updateEatenButtonState() {
+                if (!this.selectedUser) return;
+
+                const hasEaten = this.hasEatenToday(this.selectedUser);
+                this.eatenButton.disabled = hasEaten;
+                this.eatenButton.textContent = hasEaten ? 'Đã ăn rồi' : 'Đã ăn';
+            }
+
+            hasEatenToday(user) {
+                return user['Eaten'] && user['Eaten'].trim() !== '' || user['Tên'].startsWith("• ");
+            }
+
+            async markAsEaten() {
+                if (!this.selectedUser) {
+                    alert('Vui lòng chọn tên của bạn trước.');
                     return;
                 }
                 
-                const nameColumn = this.findNameColumn();
-                const shiftColumn = 'Ca';
-                const today = new Date().getDay();
-                const dayMapping = ['Chủ Nhật', 'Thứ2', 'Thứ3', 'Thứ4', 'Thứ5', 'Thứ6', 'Thứ7'];
-                const currentDayKey = (today >= 1 && today <= 6) ? dayMapping[today] : 'Thứ2';
-                
-                // Create table header
-                const headerRow = `
-                    <th>✓</th>
-                    <th>Ca</th>
-                    <th>Tên</th>
-                    <th>${currentDayKey}</th>
-                `;
-                
-                // Create table rows
-                const bodyRows = this.filteredMenuData.map(user => {
-                    const isChecked = user.eaten ? 'checked' : '';
-                    const rowClass = user.eaten ? 'eaten' : '';
-                    const displayName = user[nameColumn].replace('• ', '');
+                const userName = this.selectedUser['Tên'].replace("• ", "");
+                this.eatenButton.disabled = true;
+                this.eatenButton.textContent = 'Đang cập nhật...';
+
+                try {
+                    await this.updateEatenStatus(userName, true);
                     
+                    // Update local data immediately for instant UI feedback
+                    this.selectedUser['Eaten'] = new Date().toISOString();
+                    this.selectedUser['Tên'] = "• " + userName;
+                    this.eatenButton.textContent = 'Đã ăn rồi';
+
+                    // Refresh menu table if visible
+                    if (this.currentMode === 'menu') this.renderMenuTable();
+
+                } catch (error) {
+                    alert(`Không thể cập nhật: ${error.message}. Vui lòng thử lại.`);
+                    this.updateEatenButtonState(); // Revert button state on failure
+                }
+            }
+
+            // --- MENU MODE ---
+            
+            toggleShiftFilter() {
+                this.currentShiftFilterIndex = (this.currentShiftFilterIndex + 1) % this.shiftFilters.length;
+                this.shiftFilterBtn.textContent = this.shiftIcons[this.currentShiftFilterIndex];
+                this.shiftFilterBtn.title = `Lọc: ${this.shiftFilters[this.currentShiftFilterIndex]}`;
+                this.renderMenuTable();
+            }
+
+            getFilteredMenuData() {
+                const searchQuery = this.menuSearchInput.value.toLowerCase().trim();
+                const currentShift = this.shiftFilters[this.currentShiftFilterIndex];
+
+                const shiftMap = {
+                    'day': 'Ca sáng / Day shift',
+                    'evening': 'Ca chiều / Evening shift'
+                };
+
+                return this.allUsersData.filter(user => {
+                    // Filter by shift
+                    if (currentShift !== 'all' && user['Ca'] !== shiftMap[currentShift]) {
+                        return false;
+                    }
+                    // Filter by search query
+                    if (searchQuery) {
+                        const name = user['Tên'].replace("• ", "").toLowerCase();
+                        const unsignedName = this.removeDiacritics(name);
+                        return name.includes(searchQuery) || unsignedName.includes(searchQuery);
+                    }
+                    return true;
+                });
+            }
+
+            renderMenuTable() {
+                const filteredData = this.getFilteredMenuData();
+                
+                if (filteredData.length === 0) {
+                    this.menuTable.innerHTML = '<thead><tr><th colspan="3" style="text-align: center; padding: 40px; color: #64748b;">Không tìm thấy dữ liệu</th></tr></thead>';
+                    return;
+                }
+                
+                const today = new Date().getDay();
+                const dayMapping = ['Chủ Nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
+                const currentDayKey = dayMapping[today] || 'Thứ 2';
+
+                const headerRow = `<th>✓</th><th>Tên</th><th>${currentDayKey}</th>`;
+                
+                const bodyRows = filteredData.map(user => {
+                    const hasEaten = this.hasEatenToday(user);
+                    const userName = user['Tên'].replace("• ", "");
                     return `
-                        <tr class="${rowClass}">
+                        <tr class="${hasEaten ? 'eaten-row' : ''}">
                             <td>
                                 <div class="checkbox-container">
-                                    <input type="checkbox" ${isChecked} 
-                                           onchange="handleCheckboxChange('${displayName}', this)">
+                                    <input type="checkbox" ${hasEaten ? 'checked' : ''} 
+                                           onchange="handleCheckboxChange('${userName}', this.checked)">
                                 </div>
                             </td>
-                            <td>${user[shiftColumn] || ''}</td>
-                            <td>${displayName}</td>
+                            <td>${userName}</td>
                             <td>${user[currentDayKey] || ''}</td>
                         </tr>
                     `;
                 }).join('');
                 
-                this.menuTable.innerHTML = `
-                    <thead>
-                        <tr>${headerRow}</tr>
-                    </thead>
-                    <tbody>
-                        ${bodyRows}
-                    </tbody>
-                `;
+                this.menuTable.innerHTML = `<thead><tr>${headerRow}</tr></thead><tbody>${bodyRows}</tbody>`;
             }
-            
-            async handleCheckboxChange(userName, checkbox) {
-                const nameColumn = this.findNameColumn();
-                const currentUser = this.allUsersData.find(user => 
-                    user[nameColumn].replace('• ', '') === userName
-                );
+
+            async handleCheckboxChange(userName, isChecked) {
+                const user = this.allUsersData.find(u => u['Tên'].replace("• ", "") === userName);
+                if (!user) return;
                 
-                if (!currentUser) return;
+                const row = [...this.menuTable.querySelectorAll('tbody tr')].find(r => r.cells[1].textContent === userName);
                 
-                const isCurrentlyEaten = currentUser[nameColumn].startsWith('• ');
-                
-                if (checkbox.checked && !isCurrentlyEaten) {
-                    // Mark as eaten
-                    try {
-                        await this.updateEatenStatus(userName);
-                        
-                        // Update local menu data
-                        const menuItem = this.allMenuData.find(item => 
-                            item[nameColumn].replace('• ', '') === userName
-                        );
-                        if (menuItem) {
-                            menuItem.eaten = true;
-                            menuItem[nameColumn] = `• ${userName}`;
-                        }
-                        
-                        const filteredItem = this.filteredMenuData.find(item => 
-                            item[nameColumn].replace('• ', '') === userName
-                        );
-                        if (filteredItem) {
-                            filteredItem.eaten = true;
-                            filteredItem[nameColumn] = `• ${userName}`;
-                        }
-                        
-                        // Re-render table
-                        this.renderMenuTable();
-                        
-                    } catch (error) {
-                        console.error('Failed to update checkbox:', error);
-                        if (!this.readOnlyMode) {
-                            checkbox.checked = false;
-                            alert('Không thể cập nhật trạng thái. Vui lòng thử lại.');
-                        } else {
-                            // In read-only mode, allow local update
-                            this.renderMenuTable();
-                        }
+                try {
+                    await this.updateEatenStatus(userName, isChecked);
+                    
+                    // Update local data
+                    user['Eaten'] = isChecked ? new Date().toISOString() : '';
+                    user['Tên'] = isChecked ? "• " + userName : userName;
+                    if (row) row.classList.toggle('eaten-row', isChecked);
+                    
+                    // Update today view if the current user is the one being changed
+                    if (this.selectedUser && this.selectedUser['Tên'].replace("• ", "") === userName) {
+                        this.updateEatenButtonState();
                     }
-                } else if (!checkbox.checked && isCurrentlyEaten) {
-                    // Mark as not eaten (remove bullet point)
-                    try {
-                        // Update the name without bullet point
-                        const cleanName = currentUser[nameColumn].replace('• ', '');
-                        
-                        if (!this.readOnlyMode && this.isGapiLoaded) {
-                            // Request access token if needed
-                            if (!gapi.client.getToken()) {
-                                await new Promise((resolve, reject) => {
-                                    this.tokenClient.callback = (resp) => {
-                                        if (resp.error) {
-                                            reject(new Error(resp.error));
-                                            return;
-                                        }
-                                        resolve();
-                                    };
-                                    this.tokenClient.requestAccessToken();
-                                });
-                            }
-                            
-                            const userIndex = this.allUsersData.findIndex(user => 
-                                user[nameColumn] === currentUser[nameColumn]
-                            );
-                            const rowNumber = userIndex + 2;
-                            const range = `${this.SHEET_NAME}!B${rowNumber}`;
-                            
-                            await gapi.client.sheets.spreadsheets.values.update({
-                                spreadsheetId: this.SHEET_ID,
-                                range: range,
-                                valueInputOption: 'RAW',
-                                resource: {
-                                    values: [[cleanName]]
-                                }
-                            });
-                        }
-                        
-                        // Update local data
-                        currentUser[nameColumn] = cleanName;
-                        
-                        // Update menu data
-                        const menuItem = this.allMenuData.find(item => 
-                            item[nameColumn].replace('• ', '') === userName
-                        );
-                        if (menuItem) {
-                            menuItem.eaten = false;
-                            menuItem[nameColumn] = cleanName;
-                        }
-                        
-                        const filteredItem = this.filteredMenuData.find(item => 
-                            item[nameColumn].replace('• ', '') === userName
-                        );
-                        if (filteredItem) {
-                            filteredItem.eaten = false;
-                            filteredItem[nameColumn] = cleanName;
-                        }
-                        
-                        // Re-render table
-                        this.renderMenuTable();
-                        
-                    } catch (error) {
-                        console.error('Failed to uncheck:', error);
-                        checkbox.checked = true;
-                        if (!this.readOnlyMode) {
-                            alert('Không thể cập nhật trạng thái. Vui lòng thử lại.');
-                        }
-                    }
-                }
-                
-                // Update today view if this is the selected user
-                if (userName === this.selectedUserName) {
-                    this.updateEatenButtonState();
+
+                } catch (error) {
+                    alert(`Không thể cập nhật: ${error.message}. Vui lòng thử lại.`);
+                    // Revert checkbox state on failure
+                    const checkbox = row.querySelector('input[type="checkbox"]');
+                    if (checkbox) checkbox.checked = !isChecked;
                 }
             }
-            
+
+            // --- UTILITIES ---
+
             startPeriodicUpdates() {
-                // Update every 30 seconds
                 this.updateInterval = setInterval(async () => {
                     try {
-                        await this.loadUserDataFromGoogleSheets();
-                        this.populateUserDropdown();
-                        this.prepareMenuData();
+                        await this.fetchData();
+                        this.populateUserSelect(); // Repopulate to get name updates (•)
                         
-                        // Update UI if needed
-                        if (this.currentMode === 'menu') {
-                            this.renderMenuTable();
-                        }
-                        
-                        if (this.selectedUserName) {
-                            this.loadTodayDish();
-                            this.updateEatenButtonState();
-                        }
-                        
+                        const currentSelectedValue = this.userSelect.value;
+                        if(currentSelectedValue) this.handleUserSelection(currentSelectedValue);
+
+                        if (this.currentMode === 'menu') this.renderMenuTable();
                     } catch (error) {
                         console.warn('Periodic update failed:', error);
                     }
-                }, 30000);
+                }, 60000); // Update every 60 seconds
             }
-            
-            findNameColumn() {
-                if (this.allUsersData.length === 0) return 'Tên';
-                const possibleColumns = ['Tên', 'Họ tên', 'Name', 'Ten'];
-                for (const col of possibleColumns) {
-                    if (this.allUsersData[0].hasOwnProperty(col)) return col;
-                }
-                // Default to column B (index 1)
-                return Object.keys(this.allUsersData[0])[1] || 'Tên';
-            }
-            
-            removeDiacritics(str) {
-                if (!str) return '';
-                return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/Đ/g, 'D').replace(/đ/g, 'd');
-            }
-            
-            // Cleanup on page unload
-            destroy() {
-                if (this.updateInterval) {
-                    clearInterval(this.updateInterval);
-                }
-            }
+
+            updateLoadingText(text) { this.loadingText.textContent = text; }
+            hideLoading() { this.loadingOverlay.classList.add('hidden'); }
+            removeDiacritics(str) { return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D'); }
+            destroy() { if (this.updateInterval) clearInterval(this.updateInterval); }
         }
         
-        // Global instance
+        // --- GLOBAL SCOPE ---
         let app;
         
-        // Global functions
-        async function markAsEaten() {
-            if (app) {
-                await app.markAsEaten();
-            }
-        }
-        
-        async function handleCheckboxChange(userName, checkbox) {
-            if (app) {
-                await app.handleCheckboxChange(userName, checkbox);
-            }
-        }
-        
-        function toggleShiftFilter() {
-            if (app) {
-                app.toggleShiftFilter();
-            }
-        }
+        function markAsEaten() { app?.markAsEaten(); }
+        function handleCheckboxChange(userName, isChecked) { app?.handleCheckboxChange(userName, isChecked); }
         
         function clearCacheAndReload() {
-            if (confirm('Xóa cache sẽ làm trang web tải lại từ đầu. Bạn có chắc chắn?')) {
-                try {
-                    Object.keys(localStorage).forEach(key => {
-                        if (key.startsWith('food_menu_')) {
-                            localStorage.removeItem(key);
-                        }
-                    });
-                    location.reload();
-                } catch (error) {
-                    console.warn('Cache clear failed:', error);
-                    location.reload();
-                }
+            if (confirm('Xóa cache sẽ tải lại dữ liệu mới nhất từ Google Sheets. Bạn có chắc chắn?')) {
+                localStorage.removeItem('food_menu_data_v4');
+                localStorage.removeItem('selected_user');
+                location.reload();
             }
         }
         
-        // Initialize app when DOM is loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            app = new FoodMenuApp();
-        });
-        
-        // Cleanup on page unload
-        window.addEventListener('beforeunload', () => {
-            if (app) {
-                app.destroy();
-            }
-        });
+        document.addEventListener('DOMContentLoaded', () => { app = new FoodMenuApp(); });
+        window.addEventListener('beforeunload', () => { app?.destroy(); });
     </script>
 </body>
 </html>
