@@ -1221,8 +1221,12 @@
                 }
             }
             
-            updateLoadingText(text) {
-                this.loadingText.textContent = text;
+            clearCache() {
+                if (confirm('Xóa bộ nhớ tạm sẽ tải lại dữ liệu mới từ Google Sheets. Bạn có chắc chắn?')) {
+                    localStorage.removeItem(this.CACHE_KEY);
+                    localStorage.removeItem(this.USER_KEY);
+                    location.reload();
+                }
             }
             
             hideLoading() {
