@@ -10,235 +10,35 @@
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        :root {
-            --bg-primary: #111827; --bg-secondary: #1f2937; --bg-tertiary: #374151;
-            --text-primary: #f9fafb; --text-secondary: #d1d5db; --text-muted: #9ca3af;
-            --accent-primary: #3b82f6; --accent-secondary: #6366f1;
-            --accent-gradient: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
-            --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
-            --border-color: rgba(156, 163, 175, 0.2);
-            --shadow-sm: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
-            --shadow-md: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { -webkit-tap-highlight-color: transparent; }
-        body {
-            font-family: 'Be Vietnam Pro', sans-serif; background-color: var(--bg-primary); color: var(--text-primary);
-            height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden;
-            position: fixed; width: 100%;
-        }
-        .loading-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(17, 24, 39, 0.95);
-            backdrop-filter: blur(10px); display: flex; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 1000; transition: opacity 0.3s ease;
-        }
-        .loading-overlay.hidden { opacity: 0; pointer-events: none; }
-        .spinner {
-            width: 56px; height: 56px; border: 6px solid var(--border-color); border-top-color: var(--accent-primary);
-            border-radius: 50%; animation: spin 1s linear infinite;
-        }
-        .loading-text { margin-top: 20px; font-weight: 500; color: var(--text-secondary); font-size: 16px; text-align: center; padding: 0 20px;}
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .app-container { display: flex; flex-direction: column; height: 100%; max-width: 1200px; margin: 0 auto; width: 100%; }
-        .app-header {
-            padding: 12px 16px; display: flex; justify-content: center; background: rgba(31, 41, 55, 0.8);
-            backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color);
-        }
-        .nav-tabs { display: flex; background: var(--bg-primary); border-radius: 18px; padding: 6px; border: 1px solid var(--border-color); }
-        .nav-tab {
-            padding: 12px 24px; background: transparent; border: none; border-radius: 14px; font-size: 15px;
-            font-weight: 600; color: var(--text-muted); cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-        }
-        .nav-tab.active { background: var(--accent-gradient); color: var(--text-primary); box-shadow: var(--shadow-md); }
-        .nav-tab.highlight::after {
-            content: ''; position: absolute; top: 10px; right: 18px; width: 8px; height: 8px;
-            background: var(--warning); border-radius: 50%; animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
-        }
-        .app-content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
-        .tab-pane { display: none; padding: 24px 16px; animation: fadeIn 0.4s ease; height: 100%; }
-        .tab-pane.active { display: flex; flex-direction: column; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .menu-controls { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
-        .search-bar { flex-grow: 1; position: relative; }
-        .search-bar input {
-            width: 100%; padding: 14px 18px 14px 48px; background: var(--bg-secondary); border: 1px solid var(--border-color);
-            border-radius: 12px; color: var(--text-primary); font-size: 15px; outline: none; transition: all 0.2s ease;
-        }
-        .search-bar input:focus { border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
-        .search-bar .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
-        .filter-buttons { display: flex; background: var(--bg-secondary); border-radius: 12px; padding: 5px; border: 1px solid var(--border-color); }
-        .filter-btn {
-            padding: 8px 16px; background: transparent; border: none; border-radius: 8px; color: var(--text-muted);
-            cursor: pointer; transition: all 0.2s ease; font-weight: 600; display: flex; align-items: center; gap: 6px;
-        }
-        .filter-btn.active { background: var(--bg-tertiary); color: var(--text-primary); }
-        .menu-table-container { flex: 1; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 16px; background: var(--bg-secondary); }
-        .menu-table { width: 100%; border-collapse: collapse; }
-        .menu-table th, .menu-table td { padding: 16px; text-align: left; border-bottom: 1px solid var(--border-color); }
-        .menu-table th {
-            background: rgba(31, 41, 55, 0.9); backdrop-filter: blur(5px); position: sticky; top: 0;
-            font-weight: 700; font-size: 14px; color: var(--text-secondary);
-        }
-        .menu-table th .sort-icon { opacity: 0.5; transition: opacity 0.2s; }
-        .menu-table th:hover .sort-icon { opacity: 1; }
-        .menu-table th.sorted .sort-icon { opacity: 1; color: var(--accent-primary); }
-        .menu-table tr.group-header td {
-            background-color: var(--bg-tertiary); font-weight: 700; color: var(--text-primary);
-            padding: 10px 16px; font-size: 16px;
-        }
-        .menu-table td { font-size: 15px; font-weight: 500; transition: opacity 0.3s, filter 0.3s; }
-        .menu-table tr.checked-row td { opacity: 0.5; filter: blur(1px); }
-        .menu-table tr:last-child td { border-bottom: none; }
-        .menu-table .checkbox-cell { width: 50px; }
-        .menu-table input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--accent-primary); }
-        #today-pane { justify-content: center; align-items: center; text-align: center; }
-        .today-card {
-            background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 20px; padding: 32px;
-            width: 100%; max-width: 500px; box-shadow: var(--shadow-md);
-        }
-        .greeting { font-size: 20px; color: var(--text-secondary); margin-bottom: 8px; }
-        .today-meal {
-            font-size: 28px; font-weight: 800; margin-bottom: 32px; min-height: 40px;
-            background: var(--accent-gradient); -webkit-background-clip: text; background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .eaten-btn {
-            width: 100%; padding: 16px; background: var(--accent-gradient); border: none; border-radius: 12px;
-            color: var(--text-primary); font-size: 18px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;
-        }
-        .eaten-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 15px rgba(59, 130, 246, 0.3); }
-        .eaten-btn:disabled { background: var(--bg-tertiary); cursor: not-allowed; color: var(--text-muted); box-shadow: none; transform: none; }
-        .eaten-btn:disabled .icon { margin-right: 8px; }
-        #order-pane { gap: 24px; }
-        .order-info { background: var(--bg-secondary); border-radius: 16px; padding: 20px; text-align: center; font-weight: 600; }
-        .order-info .week-label { color: var(--accent-primary); }
-        .order-table-container { flex: 1; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 16px; background: var(--bg-secondary); }
-        .order-table { width: 100%; border-collapse: collapse; }
-        .order-table th, .order-table td { padding: 16px; text-align: left; border-bottom: 1px solid var(--border-color); }
-        .order-table th { position: sticky; top: 0; background: rgba(31, 41, 55, 0.9); backdrop-filter: blur(5px); font-size: 14px; color: var(--text-secondary); }
-        .order-table td:first-child { font-weight: 600; }
-        .order-table tr:last-child td { border-bottom: none; }
-        .hidden { display: none !important; }
-        ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--bg-tertiary); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--accent-secondary); }
-        @media (max-width: 768px) {
-            .nav-tab { padding: 12px 16px; font-size: 14px; } .tab-pane { padding: 16px; }
-            .menu-controls { flex-direction: column; } .greeting { font-size: 18px; } .today-meal { font-size: 24px; }
-        }
+        :root{--bg-primary:#111827;--bg-secondary:#1f2937;--bg-tertiary:#374151;--text-primary:#f9fafb;--text-secondary:#d1d5db;--text-muted:#9ca3af;--accent-primary:#3b82f6;--accent-secondary:#6366f1;--accent-gradient:linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);--success:#10b981;--warning:#f59e0b;--danger:#ef4444;--border-color:rgba(156, 163, 175, 0.2);--shadow-sm:0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);--shadow-md:0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)}*{margin:0;padding:0;box-sizing:border-box}html{-webkit-tap-highlight-color:transparent}body{font-family:'Be Vietnam Pro',sans-serif;background-color:var(--bg-primary);color:var(--text-primary);height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden;position:fixed;width:100%}.loading-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(17, 24, 39, 0.95);backdrop-filter:blur(10px);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1000;transition:opacity 0.3s ease}.loading-overlay.hidden{opacity:0;pointer-events:none}.spinner{width:56px;height:56px;border:6px solid var(--border-color);border-top-color:var(--accent-primary);border-radius:50%;animation:spin 1s linear infinite}.loading-text{margin-top:20px;font-weight:500;color:var(--text-secondary);font-size:16px;text-align:center;padding:0 20px}@keyframes spin{to{transform:rotate(360deg)}}.app-container{display:flex;flex-direction:column;height:100%;max-width:1200px;margin:0 auto;width:100%}.app-header{padding:12px 16px;display:flex;justify-content:center;background:rgba(31, 41, 55, 0.8);backdrop-filter:blur(12px);border-bottom:1px solid var(--border-color)}.nav-tabs{display:flex;background:var(--bg-primary);border-radius:18px;padding:6px;border:1px solid var(--border-color)}.nav-tab{padding:12px 24px;background:transparent;border:none;border-radius:14px;font-size:15px;font-weight:600;color:var(--text-muted);cursor:pointer;transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);position:relative}.nav-tab.active{background:var(--accent-gradient);color:var(--text-primary);box-shadow:var(--shadow-md)}.nav-tab.highlight::after{content:'';position:absolute;top:10px;right:18px;width:8px;height:8px;background:var(--warning);border-radius:50%;animation:pulse 1.5s infinite}@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(245, 158, 11, 0.7)}70%{box-shadow:0 0 0 10px rgba(245, 158, 11, 0)}100%{box-shadow:0 0 0 0 rgba(245, 158, 11, 0)}}.app-content{flex:1;overflow-y:auto;display:flex;flex-direction:column}.tab-pane{display:none;padding:24px 16px;animation:fadeIn 0.4s ease;height:100%}.tab-pane.active{display:flex;flex-direction:column}@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}.menu-controls{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}.search-bar{flex-grow:1;position:relative}.search-bar input{width:100%;padding:14px 18px 14px 48px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:12px;color:var(--text-primary);font-size:15px;outline:none;transition:all 0.2s ease}.search-bar input:focus{border-color:var(--accent-primary);box-shadow:0 0 0 3px rgba(59, 130, 246, 0.2)}.search-bar .search-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none}.filter-buttons{display:flex;background:var(--bg-secondary);border-radius:12px;padding:5px;border:1px solid var(--border-color)}.filter-btn{padding:8px 16px;background:transparent;border:none;border-radius:8px;color:var(--text-muted);cursor:pointer;transition:all 0.2s ease;font-weight:600;display:flex;align-items:center;gap:6px}.filter-btn.active{background:var(--bg-tertiary);color:var(--text-primary)}.menu-table-container{flex:1;overflow-y:auto;border:1px solid var(--border-color);border-radius:16px;background:var(--bg-secondary)}.menu-table{width:100%;border-collapse:collapse}.menu-table th,.menu-table td{padding:16px;text-align:left;border-bottom:1px solid var(--border-color)}.menu-table th{background:rgba(31, 41, 55, 0.9);backdrop-filter:blur(5px);position:sticky;top:0;font-weight:700;font-size:14px;color:var(--text-secondary)}.menu-table th .sort-icon{opacity:0.5;transition:opacity 0.2s}.menu-table th:hover .sort-icon{opacity:1}.menu-table th.sorted .sort-icon{opacity:1;color:var(--accent-primary)}.menu-table tr.group-header td{background-color:var(--bg-tertiary);font-weight:700;color:var(--text-primary);padding:10px 16px;font-size:16px}.menu-table td{font-size:15px;font-weight:500;transition:opacity 0.3s,filter 0.3s}.menu-table tr.checked-row td{opacity:0.5;filter:blur(1px)}.menu-table tr:last-child td{border-bottom:none}.menu-table .checkbox-cell{width:50px}.menu-table input[type=checkbox]{width:20px;height:20px;accent-color:var(--accent-primary)}#today-pane{justify-content:center;align-items:center;text-align:center}.today-card{background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:20px;padding:32px;width:100%;max-width:500px;box-shadow:var(--shadow-md)}.user-selector-container{margin-bottom:24px}.user-selector-container select{width:100%;padding:14px 18px;background:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:12px;color:var(--text-primary);font-size:16px;font-weight:600;outline:none}.greeting{font-size:20px;color:var(--text-secondary);margin-bottom:8px}.today-meal{font-size:28px;font-weight:800;margin-bottom:32px;min-height:40px;background:var(--accent-gradient);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}.eaten-btn{width:100%;padding:16px;background:var(--accent-gradient);border:none;border-radius:12px;color:var(--text-primary);font-size:18px;font-weight:700;cursor:pointer;transition:all 0.2s ease}.eaten-btn:hover{transform:translateY(-2px);box-shadow:0 8px 15px rgba(59, 130, 246, 0.3)}.eaten-btn:disabled{background:var(--bg-tertiary);cursor:not-allowed;color:var(--text-muted);box-shadow:none;transform:none}.eaten-btn:disabled .icon{margin-right:8px}#order-pane{gap:24px}.order-info{background:var(--bg-secondary);border-radius:16px;padding:20px;text-align:center;font-weight:600}.order-info .week-label{color:var(--accent-primary)}.order-table-container{flex:1;overflow-y:auto;border:1px solid var(--border-color);border-radius:16px;background:var(--bg-secondary)}.order-table{width:100%;border-collapse:collapse}.order-table th,.order-table td{padding:16px;text-align:left;border-bottom:1px solid var(--border-color)}.order-table th{position:sticky;top:0;background:rgba(31, 41, 55, 0.9);backdrop-filter:blur(5px);font-size:14px;color:var(--text-secondary)}.order-table td:first-child{font-weight:600}.order-table tr:last-child td{border-bottom:none}.hidden{display:none!important}::-webkit-scrollbar{width:8px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bg-tertiary);border-radius:4px}::-webkit-scrollbar-thumb:hover{background:var(--accent-secondary)}@media (max-width:768px){.nav-tab{padding:12px 16px;font-size:14px}.tab-pane{padding:16px}.menu-controls{flex-direction:column}.greeting{font-size:18px}.today-meal{font-size:24px}}
     </style>
 </head>
 <body>
-
-    <div id="loading" class="loading-overlay">
-        <div class="spinner"></div>
-        <p class="loading-text">Đang khởi tạo ứng dụng...</p>
-    </div>
-
+    <div id="loading" class="loading-overlay"><div class="spinner"></div><p class="loading-text">Đang khởi tạo ứng dụng...</p></div>
     <div id="app-container" class="app-container">
-        <header class="app-header">
-            <nav id="nav-tabs" class="nav-tabs">
-                <button class="nav-tab" data-tab="menu-pane">Menu</button>
-                <button class="nav-tab active" data-tab="today-pane">Hôm nay</button>
-                <button class="nav-tab" data-tab="order-pane">Đặt món</button>
-            </nav>
-        </header>
-
-        <main class="app-content">
-            <section id="menu-pane" class="tab-pane"></section>
-            <section id="today-pane" class="tab-pane active"></section>
-            <section id="order-pane" class="tab-pane"></section>
-        </main>
+        <header class="app-header"><nav id="nav-tabs" class="nav-tabs"><button class="nav-tab" data-tab="menu-pane">Menu</button><button class="nav-tab active" data-tab="today-pane">Hôm nay</button><button class="nav-tab" data-tab="order-pane">Đặt món</button></nav></header>
+        <main class="app-content"><section id="menu-pane" class="tab-pane"></section><section id="today-pane" class="tab-pane active"></section><section id="order-pane" class="tab-pane"></section></main>
     </div>
-    
-    <template id="menu-template">
-        <div class="menu-controls">
-            <div class="search-bar">
-                 <span class="search-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                </span>
-                <input type="text" id="search-input" placeholder="Tìm kiếm theo tên...">
-            </div>
-            <div class="filter-buttons">
-                <button class="filter-btn" data-shift="all">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a5 5 0 0 0-5 5c0 1.64.8 3.09 2 4h6c1.2-0.91 2-2.36 2-4a5 5 0 0 0-5-5z"></path><path d="M12 22a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2z"></path><path d="M12 11v1a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-1a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v1c0 2.21 1.79 4 4 4h1"></path><path d="M12 11v1a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-1a2 2 0 0 1 2-2h1a2 2 0 0 1 2 2v1c0 2.21-1.79 4-4 4h-1"></path></svg>
-                    <span>Tất cả</span>
-                </button>
-                <button class="filter-btn" data-shift="Sáng">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>
-                    <span>Sáng</span>
-                </button>
-                <button class="filter-btn" data-shift="Chiều">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg>
-                    <span>Chiều</span>
-                </button>
-            </div>
-        </div>
-        <div class="menu-table-container">
-            <table class="menu-table">
-                <thead>
-                    <tr>
-                        <th class="checkbox-cell"></th>
-                        <th id="sort-by-name">
-                            Tên
-                            <svg class="sort-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 16 4 4 4-4"></path><path d="M7 20V4"></path><path d="m21 8-4-4-4 4"></path><path d="M17 4v16"></path></svg>
-                        </th>
-                        <th id="today-column-header">Hôm nay</th>
-                    </tr>
-                </thead>
-                <tbody id="menu-table-body"></tbody>
-            </table>
-        </div>
-    </template>
-    
-    <template id="today-template">
-        <div class="today-card">
-            <!-- Dropdown menu đã được xóa -->
-            <p class="greeting">Chào <span id="user-name-placeholder">bạn</span>, hôm nay bạn ăn:</p>
-            <h2 id="today-meal" class="today-meal">...</h2>
-            <button id="eaten-btn" class="eaten-btn">
-                <span class="icon"></span> Đã ăn
-            </button>
-        </div>
-    </template>
-
-    <template id="order-template">
-         <div id="order-info" class="order-info">
-            Xem thực đơn cho tuần <span class="week-label" id="order-week-label">...</span>.
-        </div>
-        <div class="order-table-container">
-            <table id="order-table-vi" class="order-table"></table>
-        </div>
-        <div class="order-table-container">
-            <table id="order-table-en" class="order-table"></table>
-        </div>
-    </template>
+    <template id="menu-template"><div class="menu-controls"><div class="search-bar"><span class="search-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span><input type="text" id="search-input" placeholder="Tìm kiếm theo tên..."></div><div class="filter-buttons"><button class="filter-btn active" data-shift="all"><span>Tất cả</span></button><button class="filter-btn" data-shift="Sáng"><span>Sáng</span></button><button class="filter-btn" data-shift="Chiều"><span>Chiều</span></button></div></div><div class="menu-table-container"><table class="menu-table"><thead><tr><th class="checkbox-cell"></th><th id="sort-by-name">Tên <svg class="sort-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 16 4 4 4-4"></path><path d="M7 20V4"></path><path d="m21 8-4-4-4 4"></path><path d="M17 4v16"></path></svg></th><th id="today-column-header">Hôm nay</th></tr></thead><tbody id="menu-table-body"></tbody></table></div></template>
+    <template id="today-template"><div class="today-card"><div class="user-selector-container"><select id="user-selector"></select></div><p class="greeting">Chào <span id="user-name-placeholder">bạn</span>, hôm nay bạn ăn:</p><h2 id="today-meal" class="today-meal">...</h2><button id="eaten-btn" class="eaten-btn"><span class="icon"></span> Đã ăn</button></div></template>
+    <template id="order-template"><div id="order-info" class="order-info">Xem thực đơn cho tuần <span class="week-label" id="order-week-label">...</span>.</div><div class="order-table-container"><table id="order-table-vi" class="order-table"></table></div><div class="order-table-container"><table id="order-table-en" class="order-table"></table></div></template>
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         const InBoldMenuApp = {
             CONFIG: {
-                // !!! QUAN TRỌNG: DÁN URL MỚI BẠN NHẬN ĐƯỢC Ở BƯỚC 2 VÀO ĐÂY
-                APPS_SCRIPT_URL: 'https://script.google.com/a/macros/inbold.com/s/AKfycbwvTyVgfGx_53D0qkiee4gk2l8CNCAHafY9Xwjf6MUEHgklsOr1VQY_B1NYlil-6DeUJg/exec',
+                // !!! QUAN TRỌNG: DÁN URL MỚI NHẤT BẠN NHẬN ĐƯỢC Ở BƯỚC 2 VÀO ĐÂY
+                APPS_SCRIPT_URL: 'DÁN_URL_MỚI_CỦA_BẠN_VÀO_ĐÂY',
             },
-            STATE: {
-                allSheetData: [], currentUser: null, currentWeekSheetName: '', todayColumnIndex: -1,
-                todayColumnHeader: '', sortState: { column: 'Tên', order: 'asc' },
-            },
-            UI: {}, 
+            STATE: { allSheetData: [], currentUser: null, currentWeekSheetName: '', todayColumnIndex: -1, todayColumnHeader: '', sortState: { column: 'Tên', order: 'asc' } },
+            UI: {},
             
             init() {
                 if (this.CONFIG.APPS_SCRIPT_URL === 'DÁN_URL_MỚI_CỦA_BẠN_VÀO_ĐÂY' || this.CONFIG.APPS_SCRIPT_URL === '') {
-                    alert('LỖI CẤU HÌNH: Vui lòng dán URL Google Apps Script mới của bạn vào file HTML.');
+                    alert('LỖI CẤU HÌNH: Vui lòng dán URL Google Apps Script vào file HTML.');
                     this.showLoading('Lỗi cấu hình!');
                     return;
                 }
-                
                 this.loadTemplatesIntoPanes();
                 this.cacheDOMElements();
                 this.setupEventListeners();
@@ -252,57 +52,30 @@
             },
             
             cacheDOMElements() {
-                this.UI = {
-                    loading: document.getElementById('loading'),
-                    loadingText: document.querySelector('.loading-text'),
-                    navTabs: document.getElementById('nav-tabs'),
-                    tabPanes: document.querySelectorAll('.tab-pane'),
-                    menuTableBody: document.getElementById('menu-table-body'),
-                    searchInput: document.getElementById('search-input'),
-                    filterButtons: document.querySelectorAll('.filter-btn'),
-                    todayColumnHeader: document.getElementById('today-column-header'),
-                    sortByNameHeader: document.getElementById('sort-by-name'),
-                    userNamePlaceholder: document.getElementById('user-name-placeholder'),
-                    todayMealDisplay: document.getElementById('today-meal'),
-                    eatenBtn: document.getElementById('eaten-btn'),
-                    orderWeekLabel: document.getElementById('order-week-label'),
-                    orderTableVi: document.getElementById('order-table-vi'),
-                    orderTableEn: document.getElementById('order-table-en'),
-                    orderTab: document.querySelector('.nav-tab[data-tab="order-pane"]'),
-                };
+                this.UI = { loading: document.getElementById('loading'), loadingText: document.querySelector('.loading-text'), navTabs: document.getElementById('nav-tabs'), tabPanes: document.querySelectorAll('.tab-pane'), menuTableBody: document.getElementById('menu-table-body'), searchInput: document.getElementById('search-input'), filterButtons: document.querySelectorAll('.filter-btn'), todayColumnHeader: document.getElementById('today-column-header'), sortByNameHeader: document.getElementById('sort-by-name'), userSelector: document.getElementById('user-selector'), userNamePlaceholder: document.getElementById('user-name-placeholder'), todayMealDisplay: document.getElementById('today-meal'), eatenBtn: document.getElementById('eaten-btn'), orderWeekLabel: document.getElementById('order-week-label'), orderTableVi: document.getElementById('order-table-vi'), orderTableEn: document.getElementById('order-table-en'), orderTab: document.querySelector('.nav-tab[data-tab="order-pane"]') };
             },
 
-            showLoading(message) {
-                this.UI.loadingText.textContent = message;
-                this.UI.loading.classList.remove('hidden');
-            },
-
-            hideLoading() {
-                this.UI.loading.classList.add('hidden');
-            },
+            showLoading(message) { this.UI.loadingText.textContent = message; this.UI.loading.classList.remove('hidden'); },
+            hideLoading() { this.UI.loading.classList.add('hidden'); },
             
             async startApp() {
-                this.showLoading('Đang xác thực và tải dữ liệu...');
+                this.showLoading('Đang tải dữ liệu thực đơn...');
                 try {
-                    const response = await this.apiFetch(`?action=getUserAndMenuData`);
-                    
-                    const { userData, todayColumnHeader } = response.userDataPacket;
-                    this.STATE.currentUser = userData;
-                    this.STATE.todayColumnHeader = todayColumnHeader;
-                    this.STATE.allSheetData = response.allMenuData;
-                    
                     this.calculateCurrentWeek();
+                    const menuData = await this.fetchSheetData(this.STATE.currentWeekSheetName);
+                    if (menuData.length === 0) { throw new Error(`Không tìm thấy dữ liệu cho tuần '${this.STATE.currentWeekSheetName}'.`); }
+                    this.STATE.allSheetData = menuData;
                     
+                    this.populateUserSelector();
                     this.renderMenuTable();
-                    this.updateTodayView(); 
+                    this.updateTodayView();
                     
                     this.showLoading('Đang tải thực đơn đặt món...');
                     await this.renderOrderTab();
-                    await this.checkOrderReminder();
 
                 } catch (error) {
-                    console.error('Lỗi khi khởi động ứng dụng:', error);
-                    alert(`Không thể tải dữ liệu: ${error.message}. Vui lòng đăng nhập bằng email công ty và đảm bảo bạn có trong danh sách thực đơn.`);
+                    console.error('Lỗi khi khởi động:', error);
+                    alert(`Không thể tải dữ liệu: ${error.message}. Vui lòng kiểm tra lại URL và kết nối mạng.`);
                     this.showLoading(`Lỗi: ${error.message}`);
                 } finally {
                     this.hideLoading();
@@ -316,234 +89,99 @@
                     options.body = JSON.stringify(body);
                     options.headers = { 'Content-Type': 'text/plain;charset=utf-8' };
                 }
-
                 const response = await fetch(url, options);
+                if (!response.ok) { throw new Error(`Lỗi mạng: ${response.statusText}`); }
                 const result = await response.json();
-                
-                if (!result.success) {
-                    throw new Error(result.message || 'Lỗi không xác định từ API.');
-                }
+                if (!result.success) { throw new Error(result.message || 'Lỗi không xác định từ API.'); }
                 return result.data;
             },
 
-            async updateCell(sheetName, range, value) {
-                const payload = { sheetName, range, value };
-                return this.apiFetch('', 'POST', payload);
-            },
+            async fetchSheetData(sheetName) { return this.apiFetch(`?action=getSheetData&sheetName=${encodeURIComponent(sheetName)}`); },
+            async updateCell(sheetName, range, value) { return this.apiFetch('', 'POST', { sheetName, range, value }); },
 
             setupEventListeners() {
-                this.UI.navTabs.addEventListener('click', (e) => {
-                    if (e.target.matches('.nav-tab')) this.switchTab(e.target.dataset.tab);
-                });
+                this.UI.navTabs.addEventListener('click', (e) => { if (e.target.matches('.nav-tab')) this.switchTab(e.target.dataset.tab); });
                 this.UI.searchInput.addEventListener('input', () => this.renderMenuTable());
-                this.UI.filterButtons.forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        this.UI.filterButtons.forEach(b => b.classList.remove('active'));
-                        btn.classList.add('active');
-                        this.renderMenuTable();
-                    });
-                });
+                this.UI.filterButtons.forEach(btn => { btn.addEventListener('click', () => { this.UI.filterButtons.forEach(b => b.classList.remove('active')); btn.classList.add('active'); this.renderMenuTable(); }); });
                 this.UI.sortByNameHeader.addEventListener('click', () => this.toggleSort());
+                this.UI.userSelector.addEventListener('change', (e) => this.updateTodayView(e.target.value));
                 this.UI.eatenBtn.addEventListener('click', () => this.handleMarkAsEatenFromToday());
-                
-                document.getElementById('menu-pane').addEventListener('change', (e) => {
-                    if (e.target.matches('#menu-table-body input[type="checkbox"]')) {
-                        this.handleMarkAsEatenFromMenu(e.target);
-                    }
-                });
+                document.getElementById('menu-pane').addEventListener('change', (e) => { if (e.target.matches('#menu-table-body input[type="checkbox"]')) { this.handleMarkAsEatenFromMenu(e.target); } });
             },
             
-            switchTab(tabId) {
-                this.UI.tabPanes.forEach(pane => pane.classList.remove('active'));
-                document.getElementById(tabId).classList.add('active');
-
-                this.UI.navTabs.querySelectorAll('.nav-tab').forEach(tab => {
-                    tab.classList.toggle('active', tab.dataset.tab === tabId);
-                });
-            },
+            switchTab(tabId) { this.UI.tabPanes.forEach(pane => pane.classList.remove('active')); document.getElementById(tabId).classList.add('active'); this.UI.navTabs.querySelectorAll('.nav-tab').forEach(tab => { tab.classList.toggle('active', tab.dataset.tab === tabId); }); },
             
             renderMenuTable() {
                 const searchText = this.UI.searchInput.value.toLowerCase();
                 const activeShift = document.querySelector('.filter-btn.active').dataset.shift;
-
-                let filteredData = this.STATE.allSheetData.filter(user => {
-                    const nameMatch = user['Tên']?.toLowerCase().includes(searchText);
-                    const shiftMatch = activeShift === 'all' || user['Ca/shift'] === activeShift;
-                    return nameMatch && shiftMatch && user['Tên'];
-                });
-                
-                filteredData.sort((a, b) => {
-                    const valA = a[this.STATE.sortState.column] || '';
-                    const valB = b[this.STATE.sortState.column] || '';
-                    return this.STATE.sortState.order === 'asc' 
-                        ? valA.localeCompare(valB, 'vi')
-                        : valB.localeCompare(valA, 'vi');
-                });
-
+                let filteredData = this.STATE.allSheetData.filter(user => { const nameMatch = user['Tên']?.toLowerCase().includes(searchText); const shiftMatch = activeShift === 'all' || user['Ca/shift'] === activeShift; return nameMatch && shiftMatch && user['Tên']; });
+                filteredData.sort((a, b) => { const valA = a[this.STATE.sortState.column] || ''; const valB = b[this.STATE.sortState.column] || ''; return this.STATE.sortState.order === 'asc' ? valA.localeCompare(valB, 'vi') : valB.localeCompare(valA, 'vi'); });
                 const uncheckedRows = filteredData.filter(user => !String(user[this.STATE.todayColumnHeader]).startsWith('+'));
                 const checkedRows = filteredData.filter(user => String(user[this.STATE.todayColumnHeader]).startsWith('+'));
-
                 let html = '';
                 if (activeShift === 'all') {
                     const morningShiftUnchecked = uncheckedRows.filter(u => u['Ca/shift'] === 'Sáng');
                     const afternoonShiftUnchecked = uncheckedRows.filter(u => u['Ca/shift'] === 'Chiều');
-                    if (morningShiftUnchecked.length > 0) {
-                        html += `<tr class="group-header"><td colspan="3">☀️ Ca Sáng - Chưa nhận</td></tr>`;
-                        html += morningShiftUnchecked.map(user => this.createUserRowHtml(user)).join('');
-                    }
-                    if (afternoonShiftUnchecked.length > 0) {
-                        html += `<tr class="group-header"><td colspan="3">🌙 Ca Chiều - Chưa nhận</td></tr>`;
-                        html += afternoonShiftUnchecked.map(user => this.createUserRowHtml(user)).join('');
-                    }
-                } else if (uncheckedRows.length > 0) {
-                     html += uncheckedRows.map(user => this.createUserRowHtml(user)).join('');
-                }
-
-                if (checkedRows.length > 0) {
-                     html += `<tr class="group-header"><td colspan="3">✓ Đã nhận</td></tr>`;
-                    html += checkedRows.map(user => this.createUserRowHtml(user, true)).join('');
-                }
-
+                    if (morningShiftUnchecked.length > 0) { html += `<tr class="group-header"><td colspan="3">☀️ Ca Sáng - Chưa nhận</td></tr>`; html += morningShiftUnchecked.map(user => this.createUserRowHtml(user)).join(''); }
+                    if (afternoonShiftUnchecked.length > 0) { html += `<tr class="group-header"><td colspan="3">🌙 Ca Chiều - Chưa nhận</td></tr>`; html += afternoonShiftUnchecked.map(user => this.createUserRowHtml(user)).join(''); }
+                } else if (uncheckedRows.length > 0) { html += uncheckedRows.map(user => this.createUserRowHtml(user)).join(''); }
+                if (checkedRows.length > 0) { html += `<tr class="group-header"><td colspan="3">✓ Đã nhận</td></tr>`; html += checkedRows.map(user => this.createUserRowHtml(user, true)).join(''); }
                 this.UI.menuTableBody.innerHTML = html || '<tr><td colspan="3" style="text-align:center; padding: 20px;">Không có dữ liệu.</td></tr>';
             },
 
-            createUserRowHtml(user, isChecked = false) {
-                const meal = user[this.STATE.todayColumnHeader] || 'N/A';
-                const cleanMeal = String(meal).startsWith('+') ? String(meal).substring(1) : meal;
-                return `
-                    <tr class="${isChecked ? 'checked-row' : ''}" data-row-index="${user.rowIndex}">
-                        <td class="checkbox-cell">
-                            <input type="checkbox" ${isChecked ? 'checked' : ''} ${!meal || meal === 'N/A' ? 'disabled': ''}>
-                        </td>
-                        <td>${user['Tên']}</td>
-                        <td>${cleanMeal}</td>
-                    </tr>
-                `;
-            },
-            
-            toggleSort() {
-                this.STATE.sortState.order = this.STATE.sortState.order === 'asc' ? 'desc' : 'asc';
-                this.UI.sortByNameHeader.classList.add('sorted');
-                this.renderMenuTable();
+            createUserRowHtml(user, isChecked = false) { const meal = user[this.STATE.todayColumnHeader] || 'N/A'; const cleanMeal = String(meal).startsWith('+') ? String(meal).substring(1) : meal; return `<tr class="${isChecked ? 'checked-row' : ''}" data-row-index="${user.rowIndex}"><td class="checkbox-cell"><input type="checkbox" ${isChecked ? 'checked' : ''} ${!meal || meal === 'N/A' ? 'disabled': ''}></td><td>${user['Tên']}</td><td>${cleanMeal}</td></tr>`; },
+            toggleSort() { this.STATE.sortState.order = this.STATE.sortState.order === 'asc' ? 'desc' : 'asc'; this.UI.sortByNameHeader.classList.add('sorted'); this.renderMenuTable(); },
+
+            populateUserSelector() {
+                const users = this.STATE.allSheetData.filter(u => u['Tên']).sort((a,b) => a['Tên'].localeCompare(b['Tên'], 'vi'));
+                this.UI.userSelector.innerHTML = users.map(user => `<option value="${user.rowIndex}">${user['Tên']}</option>`).join('');
+                if (users.length > 0) { this.STATE.currentUser = users[0]; }
             },
 
-            updateTodayView() {
-                if (!this.STATE.currentUser) {
-                    this.UI.userNamePlaceholder.textContent = "Khách";
-                    this.UI.todayMealDisplay.textContent = "Không tìm thấy thông tin của bạn";
-                    this.UI.eatenBtn.disabled = true;
-                    return;
-                }
-                
+            updateTodayView(rowIndex = null) {
+                if (rowIndex) { this.STATE.currentUser = this.STATE.allSheetData.find(u => u.rowIndex == rowIndex); }
+                else if (!this.STATE.currentUser && this.STATE.allSheetData.length > 0) { this.STATE.currentUser = this.STATE.allSheetData.find(u => u['Tên']); }
+                if (!this.STATE.currentUser) return;
                 const user = this.STATE.currentUser;
+                this.UI.userSelector.value = user.rowIndex;
+                this.UI.userNamePlaceholder.textContent = user['Tên'];
                 const meal = user[this.STATE.todayColumnHeader] || 'Không có lịch';
                 const isEaten = String(meal).startsWith('+');
-
-                this.UI.userNamePlaceholder.textContent = user['Tên'];
                 this.UI.todayMealDisplay.textContent = isEaten ? String(meal).substring(1) : meal;
                 this.UI.eatenBtn.disabled = isEaten || !user[this.STATE.todayColumnHeader] || meal === 'Không có lịch';
-                this.UI.eatenBtn.innerHTML = isEaten 
-                    ? `<span class="icon">✓</span> Đã xác nhận` 
-                    : `<span class="icon"></span> Đã ăn`;
+                this.UI.eatenBtn.innerHTML = isEaten ? `<span class="icon">✓</span> Đã xác nhận` : `<span class="icon"></span> Đã ăn`;
             },
             
             async renderOrderTab() {
                 const orderData = await this.apiFetch(`?action=getOrderData`);
                 if (!orderData || orderData.length < 1) return;
-
                 const tables = this.parseOrderData(orderData);
                 this.UI.orderTableVi.innerHTML = this.createOrderTableHtml(tables.vi);
                 this.UI.orderTableEn.innerHTML = this.createOrderTableHtml(tables.en);
-                
                 const { isAfterThursday } = this.getDateInfo();
                 const targetWeek = this.getWeekNumber(new Date(), isAfterThursday ? 7 : 0);
                 this.UI.orderWeekLabel.textContent = `${targetWeek.year}-W${targetWeek.week}`;
             },
 
-            parseOrderData(data) {
-                const tables = { vi: { headers: [], rows: [] }, en: { headers: [], rows: [] } };
-                let currentTable = null;
-                
-                for (const rowObj of data) {
-                    const rowValues = Object.values(rowObj).slice(0, -1);
-                    const rowHeaders = Object.keys(rowObj).slice(0, -1);
-
-                    if (rowHeaders[0]?.toLowerCase() === 'món') {
-                        currentTable = 'vi';
-                        tables.vi.headers = rowHeaders;
-                        continue;
-                    }
-                    if (rowHeaders[0]?.toLowerCase() === 'meal') {
-                        currentTable = 'en';
-                        tables.en.headers = rowHeaders;
-                        continue;
-                    }
-                    if (currentTable && rowValues.some(cell => String(cell).trim() !== '')) {
-                        tables[currentTable].rows.push(rowValues);
-                    }
-                }
-                return tables;
-            },
-
-            createOrderTableHtml(data) {
-                if (data.headers.length === 0) return '';
-                return `
-                    <thead>
-                        <tr>${data.headers.map(h => `<th>${h}</th>`).join('')}</tr>
-                    </thead>
-                    <tbody>
-                        ${data.rows.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('')}
-                    </tbody>
-                `;
-            },
-
-            async checkOrderReminder() {
-                const { day } = this.getDateInfo();
-                 if (day >= 4 && day <= 5) { // Thursday or Friday
-                    const nextWeekSheetName = this.getWeekSheetName(true);
-                    try {
-                        // This will implicitly check; no need to fetch again, just check if sheet exists in a smarter way if possible
-                        // For now, this logic is okay, but can be optimized
-                        const nextWeekData = await this.apiFetch(`?action=getSheetData&sheetName=${encodeURIComponent(nextWeekSheetName)}`);
-                        if (!nextWeekData || nextWeekData.length < 2) {
-                             this.UI.orderTab.classList.add('highlight');
-                        }
-                    } catch (error) {
-                        this.UI.orderTab.classList.add('highlight');
-                        console.warn("Could not check next week's sheet (this is expected if it's not created yet):", error.message);
-                    }
-                 }
-            },
-
+            parseOrderData(data) { const tables = { vi: { headers: [], rows: [] }, en: { headers: [], rows: [] } }; let currentTable = null; for (const rowObj of data) { const rowValues = Object.values(rowObj).slice(0, -1); const rowHeaders = Object.keys(rowObj).slice(0, -1); if (rowHeaders[0]?.toLowerCase() === 'món') { currentTable = 'vi'; tables.vi.headers = rowHeaders; continue; } if (rowHeaders[0]?.toLowerCase() === 'meal') { currentTable = 'en'; tables.en.headers = rowHeaders; continue; } if (currentTable && rowValues.some(cell => String(cell).trim() !== '')) { tables[currentTable].rows.push(rowValues); } } return tables; },
+            createOrderTableHtml(data) { if (data.headers.length === 0) return ''; return `<thead><tr>${data.headers.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${data.rows.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('')}</tbody>`; },
+            
             async handleMarkAsEatenFromMenu(checkbox) {
                 const row = checkbox.closest('tr');
                 const rowIndex = row.dataset.rowIndex;
-                // Find and update the user in the main data list
                 const user = this.STATE.allSheetData.find(u => u.rowIndex == rowIndex);
                 if (!user) return;
-                
                 const currentMeal = user[this.STATE.todayColumnHeader];
-                const newMeal = checkbox.checked 
-                    ? `+${String(currentMeal).replace('+', '')}` 
-                    : String(currentMeal).replace('+', '');
-                
+                const newMeal = checkbox.checked ? `+${String(currentMeal).replace('+', '')}` : String(currentMeal).replace('+', '');
                 this.showLoading('Đang cập nhật...');
                 try {
                     const columnLetter = this.columnIndexToLetter(this.STATE.todayColumnIndex);
                     await this.updateCell(this.STATE.currentWeekSheetName, `${columnLetter}${rowIndex}`, newMeal);
                     user[this.STATE.todayColumnHeader] = newMeal;
-                    // Also update the currentUser if it's the same person
-                    if (this.STATE.currentUser && this.STATE.currentUser.rowIndex === user.rowIndex) {
-                        this.STATE.currentUser[this.STATE.todayColumnHeader] = newMeal;
-                    }
                     this.renderMenuTable();
                     this.updateTodayView();
-                } catch(e) {
-                    alert('Cập nhật thất bại. Vui lòng thử lại.');
-                    checkbox.checked = !checkbox.checked;
-                } finally {
-                    this.hideLoading();
-                }
+                } catch(e) { alert('Cập nhật thất bại: ' + e.message); checkbox.checked = !checkbox.checked; }
+                finally { this.hideLoading(); }
             },
 
             async handleMarkAsEatenFromToday() {
@@ -551,37 +189,25 @@
                 const user = this.STATE.currentUser;
                 const currentMeal = user[this.STATE.todayColumnHeader];
                 if (!currentMeal || String(currentMeal).startsWith('+')) return;
-
                 const newMeal = `+${currentMeal}`;
-                
                 this.showLoading('Đang cập nhật...');
                 try {
                     const columnLetter = this.columnIndexToLetter(this.STATE.todayColumnIndex);
                     await this.updateCell(this.STATE.currentWeekSheetName, `${columnLetter}${user.rowIndex}`, newMeal);
                     user[this.STATE.todayColumnHeader] = newMeal;
-
-                    // Also update the main data list
-                    const userInList = this.STATE.allSheetData.find(u => u.rowIndex === user.rowIndex);
-                    if(userInList) userInList[this.STATE.todayColumnHeader] = newMeal;
-                    
                     this.updateTodayView();
                     this.renderMenuTable();
-                } catch(e) {
-                    alert('Cập nhật thất bại. Vui lòng thử lại.');
-                } finally {
-                    this.hideLoading();
-                }
+                } catch(e) { alert('Cập nhật thất bại: ' + e.message); }
+                finally { this.hideLoading(); }
             },
 
             calculateCurrentWeek() {
                 this.STATE.currentWeekSheetName = this.getWeekSheetName();
-                // This part can be simplified since the server already tells us the column header
-                // However, we still need the column INDEX for updates (POST requests)
+                const { day } = this.getDateInfo();
                 const dayHeaders = ['Chủ Nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
+                this.STATE.todayColumnHeader = (day >= 1 && day <= 6) ? dayHeaders[day] : dayHeaders[2];
                 const dayToIndexMap = {'Thứ 2': 3, 'Thứ 3': 4, 'Thứ 4': 5, 'Thứ 5': 6, 'Thứ 6': 7};
-                
                 this.STATE.todayColumnIndex = dayToIndexMap[this.STATE.todayColumnHeader] || 3;
-                
                 document.getElementById('today-column-header').textContent = this.STATE.todayColumnHeader;
                 const currentHour = new Date().getHours();
                 const defaultShift = currentHour < 15 ? 'Sáng' : 'Chiều';
@@ -589,36 +215,10 @@
                 document.querySelector(`.filter-btn[data-shift="${defaultShift}"]`).classList.add('active');
             },
 
-            getWeekSheetName(forNextWeek = false) {
-                const { year, week } = this.getWeekNumber(new Date(), forNextWeek ? 7 : 0);
-                return `${year}-W${String(week).padStart(2, '0')}`;
-            },
-
-            getWeekNumber(d, dayOffset = 0) {
-                d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-                d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7) + dayOffset);
-                const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-                const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-                return { year: d.getUTCFullYear(), week: weekNo };
-            },
-
-            getDateInfo() {
-                const now = new Date();
-                const day = now.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
-                const isAfterThursday = day >= 4;
-                return { day, isAfterThursday };
-            },
-            
-            columnIndexToLetter(index) {
-                let letter = '', temp;
-                let col = index + 1;
-                while (col > 0) {
-                    temp = (col - 1) % 26;
-                    letter = String.fromCharCode(temp + 65) + letter;
-                    col = Math.floor((col - 1) / 26);
-                }
-                return letter;
-            }
+            getWeekSheetName(forNextWeek = false) { const { year, week } = this.getWeekNumber(new Date(), forNextWeek ? 7 : 0); return `${year}-W${String(week).padStart(2, '0')}`; },
+            getWeekNumber(d, dayOffset = 0) { d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())); d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7) + dayOffset); const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1)); const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7); return { year: d.getUTCFullYear(), week: weekNo }; },
+            getDateInfo() { const now = new Date(); const day = now.getDay(); const isAfterThursday = day >= 4; return { day, isAfterThursday }; },
+            columnIndexToLetter(index) { let letter = '', temp; let col = index + 1; while (col > 0) { temp = (col - 1) % 26; letter = String.fromCharCode(temp + 65) + letter; col = Math.floor((col - 1) / 26); } return letter; }
         };
 
         InBoldMenuApp.init();
