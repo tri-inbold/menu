@@ -11,10 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const addStaffModal = document.getElementById('add-staff-modal');
     const settingsBtn = document.getElementById('settings-btn');
 
-    // UPDATED: state lưu thêm thông tin cache
     const state = {
         currentUser: localStorage.getItem('currentUser') || '',
-        language: localStorage.getItem('language') || 'vi',
+        language: 'vi', // UPDATED: Khởi tạo mặc định, sẽ được ghi đè ngay sau đó
         currentTab: 'today',
         menuFilterMode: 'auto',
         staff: [], 
@@ -25,11 +24,10 @@ document.addEventListener('DOMContentLoaded', () => {
         orderSelection: { mon: null, tue: null, wed: null, thu: null, fri: null }
     };
 
-    // UPDATED: Thêm bản dịch mới
     const translations = {
         vi: {
             settings: 'Cài đặt', select_name: 'Chọn tên', shift_type: 'Loại ca',
-            morning_shift: 'Ca sáng', // Đã đổi
+            morning_shift: 'Ca sáng',
             rotating_shift: 'Đảo ca', evening_shift_only: 'Ca tối',
             language: 'Ngôn ngữ', add_member: 'Thêm thành viên', add_new_member: 'Thành viên mới', add: 'Thêm',
             menu: 'Thực Đơn', today: 'Hôm Nay', order: 'Đặt Món',
@@ -41,10 +39,11 @@ document.addEventListener('DOMContentLoaded', () => {
             no_menu_yet: 'Thực đơn chưa được cập nhật.', confirm_order: 'Xác nhận đơn hàng', submit_order_week: 'Hoàn tất đặt món',
             eaten: 'Đã ăn', select_name_prompt: 'Vui lòng chọn tên của bạn trong phần Cài đặt.', department: 'Phòng ban',
             update_success: 'Cập nhật thành công!', network_error: 'Không có kết nối mạng, vui lòng thử lại.',
+            no_orders: 'Không có đơn hàng',
         },
         en: {
             settings: 'Settings', select_name: 'Select name', shift_type: 'Shift Type',
-            morning_shift: 'Morning', // Đã đổi
+            morning_shift: 'Morning',
             rotating_shift: 'Rotating', evening_shift_only: 'Evening',
             language: 'Language', add_member: 'Add Member', add_new_member: 'New Member', add: 'Add',
             menu: 'Menu', today: 'Today', order: 'Order',
@@ -56,11 +55,16 @@ document.addEventListener('DOMContentLoaded', () => {
             no_menu_yet: 'Menu is not updated yet.', confirm_order: 'Confirm Order', submit_order_week: 'Complete Order',
             eaten: 'Eaten', select_name_prompt: 'Please select your name in Settings.', department: 'Department',
             update_success: 'Update successful!', network_error: 'No internet connection, please try again.',
+            no_orders: 'No orders found',
         }
     };
     
     // --- Helper & Cache Functions ---
-    const t = (key) => translations[state.language][key] || key;
+    // UPDATED: Tăng cường độ an toàn cho hàm dịch
+    const t = (key) => {
+        const langSet = translations[state.language] || translations['vi'];
+        return langSet[key] || key;
+    };
     
     const getWeekString = (date) => {
         const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
@@ -73,30 +77,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const getNextMonday = () => {
         const d = new Date();
-        d.setDate(d.getDate() + (1 + 7 - d.getDay()) % 7);
-        if (d < new Date()) d.setDate(d.getDate() + 7); // Nếu hôm nay là thứ 2, lấy thứ 2 tuần sau
+        const day = d.getDay();
+        const diff = d.getDate() - day + (day === 0 ? -6 : 1) + 7; // Lấy thứ 2 của tuần tiếp theo
+        d.setDate(diff);
         d.setHours(0, 0, 0, 0);
         return d.getTime();
     };
     
-    // NEW: Các hàm quản lý cache
     const setCache = (key, data) => {
-        const cacheData = {
-            expiry: getNextMonday(),
-            data: data
-        };
-        localStorage.setItem(key, JSON.stringify(cacheData));
+        try {
+            const cacheData = { expiry: getNextMonday(), data: data };
+            localStorage.setItem(key, JSON.stringify(cacheData));
+        } catch (e) {
+            console.error("Error setting cache:", e);
+        }
     };
+
     const getCache = (key) => {
         const itemStr = localStorage.getItem(key);
         if (!itemStr) return null;
-        const item = JSON.parse(itemStr);
-        const now = new Date().getTime();
-        if (now > item.expiry) {
+        try {
+            const item = JSON.parse(itemStr);
+            const now = new Date().getTime();
+            if (now > item.expiry) {
+                localStorage.removeItem(key);
+                return null;
+            }
+            return item.data;
+        } catch (e) {
+            console.error("Error getting cache:", e);
             localStorage.removeItem(key);
             return null;
         }
-        return item.data;
     };
 
     const parseDish = (dishString) => {
@@ -110,24 +122,20 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const updateUIlanguage = () => {
         document.querySelectorAll('[data-lang-key]').forEach(el => {
+            const key = el.dataset.langKey;
+            const translation = t(key);
             if (el.tagName === 'INPUT' || el.tagName === 'SELECT') {
-                if (el.placeholder) el.placeholder = t(el.dataset.langKey);
+                if (el.placeholder) el.placeholder = translation;
             } else {
-                el.innerText = t(el.dataset.langKey);
+                el.innerText = translation;
             }
         });
-        // Cập nhật button ngôn ngữ
         document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-        document.querySelector(`.lang-btn[data-lang="${state.language}"]`)?.classList.add('active');
+        const activeBtn = document.querySelector(`.lang-btn[data-lang="${state.language}"]`);
+        if (activeBtn) activeBtn.classList.add('active');
     };
 
-    async function fetchData(params, useCache = false) {
-        const cacheKey = useCache ? `${params.action}_${params.week}` : null;
-        if (useCache) {
-            const cachedData = getCache(cacheKey);
-            if (cachedData) return cachedData;
-        }
-
+    async function fetchData(params) {
         showLoader();
         try {
             const url = new URL(GAS_URL);
@@ -136,10 +144,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const result = await response.json();
             if (result.status === 'error') throw new Error(result.message);
-            
-            if (useCache && result.data) {
-                setCache(cacheKey, result.data);
-            }
             return result.data;
         } catch (error) {
             console.error('Fetch error:', error);
@@ -172,7 +176,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // UPDATED: Xử lý Thứ 7, CN
     function renderToday() {
         let content = '';
         if (!state.currentUser) {
@@ -184,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             content += `<div class="card glass"><h2>${t('today')}</h2>`;
 
-            if (state.thisWeekData && dayIndex >= 1 && dayIndex <= 5) { // Chỉ hiển thị từ T2-T6
+            if (state.thisWeekData && dayIndex >= 1 && dayIndex <= 5) {
                 const userOrder = state.thisWeekData.orders.find(o => o.name === state.currentUser);
                 if (userOrder && userOrder[dayKey]?.dish) {
                     const dish = userOrder[dayKey];
@@ -201,7 +204,6 @@ document.addEventListener('DOMContentLoaded', () => {
         mainContent.innerHTML = content;
     }
 
-    // UPDATED: Bọc nội dung trong card
     function renderMenu() {
         mainContent.innerHTML = `
             <div class="card glass menu-container">
@@ -225,8 +227,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!container || !filterBtn) return;
 
         const dayIndex = new Date().getDay();
-        if (dayIndex === 0 || dayIndex === 6) { // Không hiển thị gì vào T7, CN
-            container.innerHTML = `<p>${t('no_menu_today')}</p>`;
+        if (dayIndex === 0 || dayIndex === 6) {
+            container.innerHTML = `<p style="text-align: center; padding: 1rem;">${t('no_menu_today')}</p>`;
             filterBtn.style.display = 'none';
             return;
         }
@@ -252,19 +254,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="staff-name">${order.name}</span>
                     <span class="staff-dish">${dishInfo?.dish ? parseDish(dishInfo.dish) : ''}</span>
                 </div></li>`;
-        }).join('') : `<li><p style="padding: 1rem 0.5rem; color: var(--text-muted-color);">${t('no_orders') || 'Không có đơn'}</p></li>`;
+        }).join('') : `<li style="padding: 1rem 0.5rem; color: var(--text-muted-color);">${t('no_orders')}</li>`;
 
         const sangOrders = filteredOrders.filter(o => o.shift === 'Sáng').sort((a,b) => a.name.localeCompare(b.name));
         const chieuOrders = filteredOrders.filter(o => o.shift === 'Chiều').sort((a,b) => a.name.localeCompare(b.name));
         
         let html = '';
-        if (showSang) html += `<div class="shift-group"><h3>${t('morning_shift')}</h3><ul class="staff-list">${createList(sangOrders)}</ul></div>`;
-        if (showChieu) html += `<div class="shift-group"><h3>${t('evening_shift')}</h3><ul class="staff-list">${createList(chieuOrders)}</ul></div>`;
+        if (showSang && sangOrders.length > 0) html += `<div class="shift-group"><h3>${t('morning_shift')}</h3><ul class="staff-list">${createList(sangOrders)}</ul></div>`;
+        if (showChieu && chieuOrders.length > 0) html += `<div class="shift-group"><h3>${t('evening_shift')}</h3><ul class="staff-list">${createList(chieuOrders)}</ul></div>`;
+        
+        if (html === '') {
+            html = `<p style="text-align: center; padding: 1rem;">${t('no_orders')}</p>`;
+        }
         
         container.innerHTML = html;
     }
 
-    // ... (Các hàm renderOrder, createOrderedSummaryHTML, renderOrderForm, etc. không thay đổi nhiều)
     function renderOrder() {
         if (!state.currentUser) { mainContent.innerHTML = `<div class="card glass"><p>${t('select_name_prompt')}</p></div>`; return; }
         const today = new Date().getDay();
@@ -285,42 +290,60 @@ document.addEventListener('DOMContentLoaded', () => {
             <li><strong>Thứ 4:</strong> <span>${parseDish(order.wed.dish)}</span></li><li><strong>Thứ 5:</strong> <span>${parseDish(order.thu.dish)}</span></li>
             <li><strong>Thứ 6:</strong> <span>${parseDish(order.fri.dish)}</span></li></ul></div>`;
     }
+
+    function renderOrderForm(targetWeekString, menu, message) {
+        const weekNumber = targetWeekString.split('-W')[1];
+        let content = `<div class="card glass"><h2>${message}</h2><h3>${t('order_for_week')} ${weekNumber}</h3>`;
+        if (!menu || Object.values(menu).every(day => day.length === 0)) { 
+            content += `<p>${t('no_menu_yet')}</p></div>`; 
+            mainContent.innerHTML = content; 
+            return; 
+        }
+        const days = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6"];
+        content += `<div class="day-tabs">${days.map((day, i) => `<button class="day-tab ${i === 0 ? 'active' : ''}" data-day="${day}">${day}</button>`).join('')}</div>`;
+        content += `<div id="order-form-content"></div><div id="order-summary" class="hidden"></div>`;
+        mainContent.innerHTML = content;
+        renderOrderDay(days[0], menu);
+    }
     
-    // ...
+    function renderOrderDay(day, menu) {
+        //...
+    }
+    
+    function renderOrderSummary(){
+        //...
+    }
+
     mainContent.addEventListener('click', async (e) => {
-        // UPDATED: Tối ưu UX cho nút "Xác nhận đã ăn"
         if (e.target.id === 'eat-button') {
             if (!navigator.onLine) {
                 alert(t('network_error'));
                 return;
             }
-            // UI Update lạc quan
             e.target.disabled = true;
             e.target.innerText = t('eaten');
             
-            // Call API ngầm
             fetchData({ action: 'markAsEaten', name: state.currentUser, week: state.thisWeekString })
                 .then(result => {
                     if (result) {
-                        // Tải lại dữ liệu và cập nhật cache
-                        return fetchData({ action: 'getWeekData', week: state.thisWeekString }, true);
+                        return fetchData({ action: 'getWeekData', week: state.thisWeekString });
                     }
                 })
                 .then(newData => {
-                    if (newData) state.thisWeekData = newData;
+                    if (newData) {
+                        state.thisWeekData = newData;
+                        setCache(`getWeekData_${state.thisWeekString}`, newData);
+                    }
                 })
                 .catch(err => {
-                    // Nếu lỗi, hoàn tác UI và báo cho người dùng
                     e.target.disabled = false;
                     e.target.innerText = t('confirm_eaten');
                     alert('Đã có lỗi xảy ra, vui lòng thử lại.');
                 });
         }
-        
         // ... Các event listener khác
     });
 
-    // UPDATED: Logic chuyển tab để xử lý cache
     tabBar.addEventListener('click', async (e) => {
         if (e.target.classList.contains('tab-link')) {
             const tab = e.target.dataset.tab;
@@ -330,12 +353,11 @@ document.addEventListener('DOMContentLoaded', () => {
             e.target.classList.add('active');
             state.currentTab = tab;
 
-            // Nếu chuyển sang tab Thực đơn, luôn tải lại dữ liệu mới nhất
             if (tab === 'menu') {
-                const freshData = await fetchData({ action: 'getWeekData', week: state.thisWeekString }, false); // false = không dùng cache
+                const freshData = await fetchData({ action: 'getWeekData', week: state.thisWeekString });
                 if (freshData) {
                     state.thisWeekData = freshData;
-                    setCache(`getWeekData_${state.thisWeekString}`, freshData); // Cập nhật lại cache
+                    setCache(`getWeekData_${state.thisWeekString}`, freshData);
                 }
             }
             render();
@@ -347,7 +369,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.onclick = (e) => { if (e.target == settingsModal || e.target == addStaffModal) { settingsModal.classList.add('hidden'); addStaffModal.classList.add('hidden'); } };
     document.getElementById('add-staff-button').onclick = () => { addStaffModal.classList.remove('hidden'); };
     
-    // UPDATED: Thêm sự kiện cho phòng ban và ngôn ngữ
     document.querySelector('#settings-modal .modal-content').addEventListener('change', async (e) => {
         if (e.target.id === 'user-select') {
             state.currentUser = e.target.value;
@@ -361,20 +382,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const user = state.staff.find(s => s.name === state.currentUser);
             if (user) user.shift = newShiftType;
         }
-        // NEW: Cập nhật phòng ban
         if (e.target.id === 'user-department') {
-            const newDepartment = e.target.value;
-            await fetchData({ action: 'updateDepartment', name: state.currentUser, department: newDepartment });
-            const user = state.staff.find(s => s.name === state.currentUser);
-            if (user) user.department = newDepartment;
+            const newDepartment = e.target.value.trim();
+            if (newDepartment) {
+                await fetchData({ action: 'updateDepartment', name: state.currentUser, department: newDepartment });
+                const user = state.staff.find(s => s.name === state.currentUser);
+                if (user) user.department = newDepartment;
+            }
         }
     });
 
-    document.querySelector('#settings-modal .modal-content').addEventListener('click', async (e) => {
+    document.querySelector('#settings-modal .modal-content').click('click', async (e) => {
         if (e.target.classList.contains('lang-btn')) {
             state.language = e.target.dataset.lang;
             localStorage.setItem('language', state.language);
-            // Cập nhật ngôn ngữ trên backend
             if (state.currentUser) {
                 await fetchData({ action: 'updateLanguage', name: state.currentUser, language: state.language });
                 const user = state.staff.find(s => s.name === state.currentUser);
@@ -383,62 +404,78 @@ document.addEventListener('DOMContentLoaded', () => {
             render();
         }
     });
-
-    // ... (Hàm submit-new-staff không đổi)
     
-    // NEW: Hàm cập nhật view Cài đặt
+    document.getElementById('submit-new-staff').onclick = async () => {
+        // ...
+    };
+    
     function updateSettingsView() {
         const currentUserInfo = state.staff.find(s => s.name === state.currentUser);
         if (currentUserInfo) {
-            // Cập nhật phòng ban
             document.getElementById('user-department').value = currentUserInfo.department || '';
-            // Cập nhật ca
             const shiftRadio = document.querySelector(`input[name="shift-type"][value="${currentUserInfo.shift}"]`);
             if (shiftRadio) shiftRadio.checked = true;
-            // Cập nhật ngôn ngữ
-            state.language = currentUserInfo.language || localStorage.getItem('language') || 'vi';
-            localStorage.setItem('language', state.language);
+            else { // Nếu ca không hợp lệ, reset
+                 const defaultShift = document.querySelector(`input[name="shift-type"]`);
+                 if(defaultShift) defaultShift.checked = true;
+            }
+            // Ngôn ngữ đã được set trong init, chỉ cần cập nhật UI
             updateUIlanguage();
         }
     }
 
     async function init() {
+        // 1. Set up week strings
         const today = new Date();
         state.thisWeekString = getWeekString(today);
         state.nextWeekString = getWeekString(new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000));
+
+        // 2. Fetch all necessary data, using cache where possible
+        const staffPromise = fetchData({ action: 'getStaff' });
+        const thisWeekPromise = getCache(`getWeekData_${state.thisWeekString}`) || fetchData({ action: 'getWeekData', week: state.thisWeekString });
+        const nextWeekPromise = getCache(`getWeekData_${state.nextWeekString}`) || fetchData({ action: 'getWeekData', week: state.nextWeekString });
         
-        // UPDATED: Tải dữ liệu từ cache trước, sau đó mới fetch API nếu cần
-        const [staffData, thisWeekData, nextWeekData] = await Promise.all([
-            fetchData({ action: 'getStaff' }),
-            fetchData({ action: 'getWeekData', week: state.thisWeekString }, true), // true = dùng cache
-            fetchData({ action: 'getWeekData', week: state.nextWeekString }, true) // true = dùng cache
-        ]);
+        const [staffData, thisWeekData, nextWeekData] = await Promise.all([staffPromise, thisWeekPromise, nextWeekPromise]);
 
         state.staff = staffData || [];
         state.thisWeekData = thisWeekData;
         state.nextWeekData = nextWeekData;
         
+        setCache(`getWeekData_${state.thisWeekString}`, state.thisWeekData);
+        setCache(`getWeekData_${state.nextWeekString}`, state.nextWeekData);
+
+        // 3. **FIX**: Determine the correct language BEFORE rendering anything.
+        const currentUserInfo = state.staff.find(s => s.name === state.currentUser);
+        if (currentUserInfo && (currentUserInfo.language === 'vi' || currentUserInfo.language === 'en')) {
+            state.language = currentUserInfo.language;
+        } else {
+            const storedLang = localStorage.getItem('language');
+            state.language = (storedLang === 'vi' || storedLang === 'en') ? storedLang : 'vi';
+        }
+        localStorage.setItem('language', state.language);
+
+        // 4. Now that language is set, render UI components
         const userSelect = document.getElementById('user-select');
         userSelect.innerHTML = `<option value="">-- ${t('select_name')} --</option>${state.staff.map(s => `<option value="${s.name}" ${state.currentUser === s.name ? 'selected' : ''}>${s.name}</option>`).join('')}`;
-        
-        updateSettingsView(); // Cập nhật các trường trong setting
 
-        // NEW: Kiểm tra thiếu thông tin và tự mở Cài đặt
-        const currentUserInfo = state.staff.find(s => s.name === state.currentUser);
+        // 5. Update the settings modal with the user's full info
+        updateSettingsView();
+
+        // 6. Check for missing info and show modal if necessary
         if (state.currentUser && currentUserInfo) {
             const { name, email, department, shift, language } = currentUserInfo;
             if (!name || !email || !department || !shift || !language) {
                 settingsModal.classList.remove('hidden');
             }
         } else if (state.currentUser) {
-            // Tên người dùng có trong localStorage nhưng không có trong danh sách staff
-            localStorage.removeItem('currentUser');
             state.currentUser = '';
+            localStorage.removeItem('currentUser');
+            userSelect.value = '';
         }
-        
+
+        // 7. Final render of the current tab
         render();
     }
     
     init();
 });
-
