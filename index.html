@@ -1,5 +1,3 @@
-<!-- --- START OF FILE Index.html --- -->
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -28,12 +26,12 @@
                 <label for="user-select" data-lang-key="select_name">Chọn tên</label>
                 <select id="user-select"></select>
 
-                <label for="user-department" data-lang-key="department">Phòng ban</label>
-                <input type="text" id="user-department" placeholder="Phòng ban của bạn">
+                <label for="department-input" data-lang-key="department">Phòng ban</label>
+                <input type="text" id="department-input" placeholder="Phòng ban">
 
                 <label data-lang-key="shift_type">Loại ca</label>
                 <div class="shift-toggle">
-                    <input type="radio" id="ca-sang" name="shift-type" value="Ca sáng"><label for="ca-sang" data-lang-key="morning_shift">Ca Sáng</label>
+                    <input type="radio" id="sang" name="shift-type" value="Ca sáng"><label for="sang" data-lang-key="morning_shift">Ca sáng</label>
                     <input type="radio" id="dao-ca" name="shift-type" value="Đảo ca"><label for="dao-ca" data-lang-key="rotating_shift">Đảo ca</label>
                     <input type="radio" id="ca-toi" name="shift-type" value="Ca tối"><label for="ca-toi" data-lang-key="evening_shift_only">Ca tối</label>
                 </div>
@@ -43,10 +41,9 @@
                     <button data-lang="vi" class="lang-btn">VI</button>
                     <button data-lang="en" class="lang-btn">EN</button>
                 </div>
-                
+
+                <button id="save-settings-btn" class="btn-primary" data-lang-key="save_settings">Lưu thay đổi</button>
                 <button id="add-staff-button" class="btn-secondary" data-lang-key="add_member">Thêm thành viên</button>
-                <!-- NEW: Thêm nút xóa cache -->
-                <button id="clear-cache-btn" class="btn-secondary" data-lang-key="clear_cache" style="margin-top: 0.5rem;">Xóa cache</button>
             </div>
         </div>
 
