@@ -1,7 +1,7 @@
 // --- START OF FILE script.js ---
 
 document.addEventListener('DOMContentLoaded', () => {
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbwp7fkxzx9cxChbpyZhmv_oZLkzcyxKVxh9JPIqwLu9tc620PA98b0Me_mq-sSKj9BWpQ/exec";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbwdOCSNV71fRmLjIqIwrk9FwSZbHOX1M2MY7geFTpCu0-D21hkU-BWEpzKy3Pja8BRz4Q/exec";
 
     const mainContent = document.getElementById('main-content');
     const tabBar = document.getElementById('tab-bar');
@@ -277,3 +277,4 @@ document.addEventListener('DOMContentLoaded', () => {
     
     init();
 });
+
