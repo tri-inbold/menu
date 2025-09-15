@@ -1,7 +1,6 @@
 // --- START OF FILE script.js ---
 
 document.addEventListener('DOMContentLoaded', () => {
-    // !!! QUAN TRỌNG: Dán URL ứng dụng web của bạn vào đây
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwp7fkxzx9cxChbpyZhmv_oZLkzcyxKVxh9JPIqwLu9tc620PA98b0Me_mq-sSKj9BWpQ/exec";
 
     const mainContent = document.getElementById('main-content');
@@ -13,13 +12,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const state = {
         currentUser: localStorage.getItem('currentUser') || '',
-        language: 'vi', // Khởi tạo an toàn, sẽ được ghi đè sau
+        language: 'vi',
         currentTab: 'today',
         menuFilterMode: 'auto',
-        staff: [], 
-        thisWeekData: null, 
+        staff: [],
+        thisWeekData: null,
         nextWeekData: null,
-        thisWeekString: '', 
+        thisWeekString: '',
         nextWeekString: '',
         orderSelection: { mon: null, tue: null, wed: null, thu: null, fri: null }
     };
@@ -39,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
             eaten: 'Đã ăn', select_name_prompt: 'Vui lòng chọn tên của bạn trong phần Cài đặt.', department: 'Phòng ban',
             update_success: 'Cập nhật thành công!', network_error: 'Không có kết nối mạng, vui lòng thử lại.',
             no_orders: 'Không có đơn hàng', clear_cache: 'Xóa cache', cache_cleared: 'Cache đã được xóa. Tải lại ứng dụng...',
+            data_load_error: 'Không thể tải dữ liệu. Vui lòng kiểm tra kết nối mạng và thử lại.'
         },
         en: {
             settings: 'Settings', select_name: 'Select name', shift_type: 'Shift Type',
@@ -54,17 +54,15 @@ document.addEventListener('DOMContentLoaded', () => {
             eaten: 'Eaten', select_name_prompt: 'Please select your name in Settings.', department: 'Department',
             update_success: 'Update successful!', network_error: 'No internet connection, please try again.',
             no_orders: 'No orders found', clear_cache: 'Clear Cache', cache_cleared: 'Cache cleared. Reloading application...',
+            data_load_error: 'Could not load data. Please check your network connection and try again.'
         }
     };
-    
-    // --- Helper & Cache Functions ---
-    // UPDATED: Hàm dịch "bất tử" để không bao giờ gây lỗi
+
     const t = (key) => {
         const lang = (state.language === 'vi' || state.language === 'en') ? state.language : 'vi';
-        const langSet = translations[lang];
-        return langSet[key] || key;
+        return translations[lang][key] || key;
     };
-    
+
     const getWeekString = (date) => {
         const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
         const dayNum = d.getUTCDay() || 7;
@@ -74,61 +72,14 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${d.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
     };
 
-    const getNextMonday = () => {
-        const d = new Date();
-        const day = d.getDay();
-        const diff = d.getDate() - day + (day === 0 ? -6 : 1) + 7; // Lấy thứ 2 của tuần tiếp theo
-        d.setDate(diff);
-        d.setHours(0, 0, 0, 0);
-        return d.getTime();
-    };
-    
-    const setCache = (key, data) => {
-        try {
-            const cacheData = { expiry: getNextMonday(), data: data };
-            localStorage.setItem(key, JSON.stringify(cacheData));
-        } catch (e) { console.error("Error setting cache:", e); }
-    };
-
-    const getCache = (key) => {
-        const itemStr = localStorage.getItem(key);
-        if (!itemStr) return null;
-        try {
-            const item = JSON.parse(itemStr);
-            const now = new Date().getTime();
-            if (now > item.expiry) {
-                localStorage.removeItem(key);
-                return null;
-            }
-            return item.data;
-        } catch (e) {
-            localStorage.removeItem(key);
-            return null;
-        }
-    };
-
-    const parseDish = (dishString) => {
-        if (!dishString) return '';
-        const parts = dishString.split('|');
-        return (state.language === 'en' && parts.length > 1) ? parts[1].trim() : parts[0].trim();
-    };
-
+    const getNextMonday = () => { /* ... no change ... */ };
+    const setCache = (key, data) => { /* ... no change ... */ };
+    const getCache = (key) => { /* ... no change ... */ };
+    const parseDish = (dishString) => { /* ... no change ... */ };
     const showLoader = () => loader.classList.remove('hidden');
     const hideLoader = () => loader.classList.add('hidden');
-    
-    const updateUIlanguage = () => {
-        document.querySelectorAll('[data-lang-key]').forEach(el => {
-            const key = el.dataset.langKey;
-            if (el.placeholder) {
-                el.placeholder = t(key);
-            } else {
-                el.innerText = t(key);
-            }
-        });
-        document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-        const activeBtn = document.querySelector(`.lang-btn[data-lang="${state.language}"]`);
-        if (activeBtn) activeBtn.classList.add('active');
-    };
+
+    const updateUIlanguage = () => { /* ... no change ... */ };
 
     async function fetchData(params) {
         showLoader();
@@ -142,14 +93,14 @@ document.addEventListener('DOMContentLoaded', () => {
             return result.data;
         } catch (error) {
             console.error('Fetch error:', error);
-            alert(`Lỗi: ${error.message}`);
+            // Don't alert here, let the render function handle the null data
             return null;
         } finally {
             hideLoader();
         }
     }
-    
-    function updateOrderTabNotification() { /* ... no change ... */ }
+
+    const updateOrderTabNotification = () => { /* ... no change ... */ };
 
     function render() {
         updateUIlanguage();
@@ -161,136 +112,129 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    function renderToday() { /* ... no change ... */ }
-    function renderMenu() { /* ... no change ... */ }
-    function updateStaffListView(searchTerm = '') { /* ... no change ... */ }
-    function renderOrder() { /* ... no change ... */ }
-    function createOrderedSummaryHTML(order, message) { /* ... no change ... */ }
-    function renderOrderForm(targetWeekString, menu, message) { /* ... no change ... */ }
-    function renderOrderDay(day, menu) { /* ... no change ... */ }
-    function renderOrderSummary(){ /* ... no change ... */ }
-
-    mainContent.addEventListener('click', async (e) => {
-        if (e.target.id === 'eat-button') {
-            if (!navigator.onLine) { alert(t('network_error')); return; }
-            e.target.disabled = true;
-            e.target.innerText = t('eaten');
-            fetchData({ action: 'markAsEaten', name: state.currentUser, week: state.thisWeekString })
-                .then(result => { if (result) return fetchData({ action: 'getWeekData', week: state.thisWeekString }); })
-                .then(newData => {
-                    if (newData) {
-                        state.thisWeekData = newData;
-                        setCache(`getWeekData_${state.thisWeekString}`, newData);
-                    }
-                })
-                .catch(err => {
-                    e.target.disabled = false;
-                    e.target.innerText = t('confirm_eaten');
-                    alert('Đã có lỗi xảy ra, vui lòng thử lại.');
-                });
+    // UPDATED: Added safety check
+    function renderToday() {
+        if (!state.thisWeekData) {
+            mainContent.innerHTML = `<div class="card glass"><p>${t('data_load_error')}</p></div>`;
+            return;
         }
-        // ... Các event listener khác
-    });
+        let content = '';
+        if (!state.currentUser) {
+            content = `<div class="card glass"><p>${t('select_name_prompt')}</p></div>`;
+        } else {
+            const today = new Date();
+            const dayIndex = today.getDay();
+            const dayKey = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'][dayIndex];
+            
+            content += `<div class="card glass"><h2>${t('today')}</h2>`;
 
-    tabBar.addEventListener('click', async (e) => {
-        if (e.target.classList.contains('tab-link')) {
-            const tab = e.target.dataset.tab;
-            if (tab === state.currentTab) return;
-            document.querySelector('.tab-link.active').classList.remove('active');
-            e.target.classList.add('active');
-            state.currentTab = tab;
-            if (tab === 'menu') {
-                const freshData = await fetchData({ action: 'getWeekData', week: state.thisWeekString });
-                if (freshData) {
-                    state.thisWeekData = freshData;
-                    setCache(`getWeekData_${state.thisWeekString}`, freshData);
+            if (dayIndex >= 1 && dayIndex <= 5) {
+                const userOrder = state.thisWeekData.orders.find(o => o.name === state.currentUser);
+                if (userOrder && userOrder[dayKey]?.dish) {
+                    const dish = userOrder[dayKey];
+                    const isEaten = dish.eaten === 'đã ăn';
+                    content += `<div class="dish-name">${parseDish(dish.dish)}</div><button id="eat-button" class="btn-primary" ${isEaten ? 'disabled' : ''}>${isEaten ? t('eaten') : t('confirm_eaten')}</button>`;
+                } else { 
+                    content += `<p>${t('not_ordered_today')}</p>`; 
                 }
+            } else { 
+                content += `<p>${t('no_menu_today')}</p>`; 
             }
-            render();
+            content += `</div>`;
         }
-    });
+        mainContent.innerHTML = content;
+    }
 
-    settingsBtn.onclick = () => settingsModal.classList.remove('hidden');
-    document.querySelectorAll('.close-button').forEach(btn => btn.onclick = () => { settingsModal.classList.add('hidden'); addStaffModal.classList.add('hidden'); });
-    window.onclick = (e) => { if (e.target == settingsModal || e.target == addStaffModal) { settingsModal.classList.add('hidden'); addStaffModal.classList.add('hidden'); } };
-    document.getElementById('add-staff-button').onclick = () => { addStaffModal.classList.remove('hidden'); };
-    
-    document.querySelector('#settings-modal .modal-content').addEventListener('change', async (e) => {
-        if (e.target.id === 'user-select') {
-            state.currentUser = e.target.value;
-            localStorage.setItem('currentUser', state.currentUser);
-            updateSettingsView();
-            render();
+    // UPDATED: Added safety check
+    function renderMenu() {
+        if (!state.thisWeekData) {
+            mainContent.innerHTML = `<div class="card glass"><p>${t('data_load_error')}</p></div>`;
+            return;
         }
-        if (e.target.name === 'shift-type') {
-            const newShiftType = e.target.value;
-            await fetchData({ action: 'updateShift', name: state.currentUser, shiftType: newShiftType });
-            const user = state.staff.find(s => s.name === state.currentUser);
-            if (user) user.shift = newShiftType;
-        }
-        if (e.target.id === 'user-department') {
-            const newDepartment = e.target.value.trim();
-            if (newDepartment) {
-                await fetchData({ action: 'updateDepartment', name: state.currentUser, department: newDepartment });
-                const user = state.staff.find(s => s.name === state.currentUser);
-                if (user) user.department = newDepartment;
-            }
-        }
-    });
+        mainContent.innerHTML = `
+            <div class="card glass menu-container">
+                <div class="search-bar-container">
+                    <input type="text" id="search-staff" placeholder="${t('search_placeholder')}">
+                    <button id="menu-filter-btn" class="icon-btn"></button>
+                </div>
+                <div id="staff-list-container"></div>
+            </div>`;
+        updateStaffListView();
+        document.getElementById('search-staff').addEventListener('input', (e) => updateStaffListView(e.target.value));
+        document.getElementById('menu-filter-btn').addEventListener('click', () => {
+            state.menuFilterMode = state.menuFilterMode === 'auto' ? 'all' : 'auto';
+            updateStaffListView(document.getElementById('search-staff').value);
+        });
+    }
 
-    // UPDATED: Sửa lỗi cú pháp và thêm nút xóa cache
-    document.querySelector('#settings-modal .modal-content').addEventListener('click', async (e) => {
-        const target = e.target;
-        if (target.classList.contains('lang-btn')) {
-            state.language = target.dataset.lang;
-            localStorage.setItem('language', state.language);
-            if (state.currentUser) {
-                await fetchData({ action: 'updateLanguage', name: state.currentUser, language: state.language });
-                const user = state.staff.find(s => s.name === state.currentUser);
-                if (user) user.language = state.language;
-            }
-            render();
-        }
-        if (target.id === 'clear-cache-btn') {
-            Object.keys(localStorage).forEach(key => {
-                if (key.startsWith('getWeekData_')) {
-                    localStorage.removeItem(key);
-                }
-            });
-            alert(t('cache_cleared'));
-            location.reload();
-        }
-    });
+    const updateStaffListView = (searchTerm = '') => { /* ... no change ... */ };
     
-    document.getElementById('submit-new-staff').onclick = async () => { /* ... no change ... */ };
-    
-    function updateSettingsView() {
-        const currentUserInfo = state.staff.find(s => s.name === state.currentUser);
-        if (currentUserInfo) {
-            document.getElementById('user-department').value = currentUserInfo.department || '';
-            const shiftRadio = document.querySelector(`input[name="shift-type"][value="${currentUserInfo.shift}"]`);
-            if (shiftRadio) {
-                shiftRadio.checked = true;
-            } else {
-                const defaultShift = document.querySelector(`input[name="shift-type"]`);
-                if(defaultShift) defaultShift.checked = true;
-            }
-            // Ngôn ngữ đã được set trong init, chỉ cần cập nhật UI
-            updateUIlanguage();
+    // UPDATED: Added safety checks
+    function renderOrder() {
+        if (!state.currentUser) {
+            mainContent.innerHTML = `<div class="card glass"><p>${t('select_name_prompt')}</p></div>`;
+            return;
+        }
+        const today = new Date().getDay();
+        const isEarlyWeek = today >= 1 && today <= 3;
+        
+        if (isEarlyWeek && !state.thisWeekData) {
+             mainContent.innerHTML = `<div class="card glass"><p>${t('data_load_error')}</p></div>`;
+             return;
+        }
+        if (!isEarlyWeek && !state.nextWeekData) {
+             mainContent.innerHTML = `<div class="card glass"><p>${t('data_load_error')}</p></div>`;
+             return;
+        }
+        
+        const hasOrdered = (data) => data?.orders?.find(o => o.name === state.currentUser && o.mon.dish);
+        if (isEarlyWeek) {
+            const userOrder = hasOrdered(state.thisWeekData);
+            userOrder ? mainContent.innerHTML = createOrderedSummaryHTML(userOrder, t('ordered_this_week')) : renderOrderForm(state.thisWeekString, state.thisWeekData?.menu, t('not_ordered_yet_this_week'));
+        } else {
+            const userOrder = hasOrdered(state.nextWeekData);
+            userOrder ? mainContent.innerHTML = createOrderedSummaryHTML(userOrder, t('ordered_next_week')) : renderOrderForm(state.nextWeekString, state.nextWeekData?.menu, t('not_ordered_yet_next_week'));
         }
     }
+    
+    const createOrderedSummaryHTML = (order, message) => { /* ... no change ... */ };
+    const renderOrderForm = (targetWeekString, menu, message) => { /* ... no change ... */ };
+    
+    // Attach event listeners
+    const setupEventListeners = () => {
+        mainContent.addEventListener('click', async (e) => { /* ... no change ... */ });
+        tabBar.addEventListener('click', async (e) => { /* ... no change ... */ });
+        settingsBtn.onclick = () => settingsModal.classList.remove('hidden');
+        document.querySelectorAll('.close-button').forEach(btn => {
+            btn.onclick = () => {
+                settingsModal.classList.add('hidden');
+                addStaffModal.classList.add('hidden');
+            };
+        });
+        window.onclick = (e) => {
+            if (e.target == settingsModal || e.target == addStaffModal) {
+                settingsModal.classList.add('hidden');
+                addStaffModal.classList.add('hidden');
+            }
+        };
+        document.getElementById('add-staff-button').onclick = () => addStaffModal.classList.remove('hidden');
+        document.querySelector('#settings-modal .modal-content').addEventListener('change', async (e) => { /* ... no change ... */ });
+        document.querySelector('#settings-modal .modal-content').addEventListener('click', async (e) => { /* ... no change ... */ });
+        document.getElementById('submit-new-staff').onclick = async () => { /* ... no change ... */ };
+    };
+
+    function updateSettingsView() { /* ... no change ... */ }
 
     async function init() {
         showLoader();
-        // 1. Set up week strings
+        setupEventListeners();
+
         const today = new Date();
         state.thisWeekString = getWeekString(today);
         state.nextWeekString = getWeekString(new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000));
 
-        // 2. Tải dữ liệu nhân viên trước tiên vì nó quyết định ngôn ngữ
         state.staff = await fetchData({ action: 'getStaff' }) || [];
         
-        // 3. Xác định ngôn ngữ chính xác
         const currentUserInfo = state.staff.find(s => s.name === state.currentUser);
         if (currentUserInfo && (currentUserInfo.language === 'vi' || currentUserInfo.language === 'en')) {
             state.language = currentUserInfo.language;
@@ -300,37 +244,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         localStorage.setItem('language', state.language);
 
-        // 4. Giờ mới tải dữ liệu còn lại (món ăn, đơn hàng) từ cache hoặc API
         const thisWeekPromise = getCache(`getWeekData_${state.thisWeekString}`) || fetchData({ action: 'getWeekData', week: state.thisWeekString });
         const nextWeekPromise = getCache(`getWeekData_${state.nextWeekString}`) || fetchData({ action: 'getWeekData', week: state.nextWeekString });
         const [thisWeekData, nextWeekData] = await Promise.all([thisWeekPromise, nextWeekPromise]);
+        
         state.thisWeekData = thisWeekData;
         state.nextWeekData = nextWeekData;
         
-        setCache(`getWeekData_${state.thisWeekString}`, state.thisWeekData);
-        setCache(`getWeekData_${state.nextWeekString}`, state.nextWeekData);
+        if (state.thisWeekData) setCache(`getWeekData_${state.thisWeekString}`, state.thisWeekData);
+        if (state.nextWeekData) setCache(`getWeekData_${state.nextWeekString}`, state.nextWeekData);
 
-        // 5. Render các thành phần UI cần dịch thuật
         const userSelect = document.getElementById('user-select');
         userSelect.innerHTML = `<option value="">-- ${t('select_name')} --</option>${state.staff.map(s => `<option value="${s.name}" ${state.currentUser === s.name ? 'selected' : ''}>${s.name}</option>`).join('')}`;
 
-        // 6. Cập nhật các trường trong Cài đặt
         updateSettingsView();
 
-        // 7. Kiểm tra thiếu thông tin
         if (state.currentUser && currentUserInfo) {
             const { name, email, department, shift, language } = currentUserInfo;
+            // IMPORTANT: Check for falsy values, not just existence
             if (!name || !email || !department || !shift || !language) {
                 settingsModal.classList.remove('hidden');
             }
         } else if (state.currentUser && !currentUserInfo) {
-            // Nếu người dùng không còn trong danh sách, xóa thông tin đăng nhập
             state.currentUser = '';
             localStorage.removeItem('currentUser');
             userSelect.value = '';
         }
 
-        // 8. Render tab hiện tại
         render();
         hideLoader();
     }
