@@ -28,13 +28,11 @@
                 <label for="user-select" data-lang-key="select_name">Chọn tên</label>
                 <select id="user-select"></select>
 
-                <!-- NEW: Thêm trường Phòng ban -->
                 <label for="user-department" data-lang-key="department">Phòng ban</label>
                 <input type="text" id="user-department" placeholder="Phòng ban của bạn">
 
                 <label data-lang-key="shift_type">Loại ca</label>
                 <div class="shift-toggle">
-                    <!-- UPDATED: Đổi value và data-lang-key -->
                     <input type="radio" id="ca-sang" name="shift-type" value="Ca sáng"><label for="ca-sang" data-lang-key="morning_shift">Ca Sáng</label>
                     <input type="radio" id="dao-ca" name="shift-type" value="Đảo ca"><label for="dao-ca" data-lang-key="rotating_shift">Đảo ca</label>
                     <input type="radio" id="ca-toi" name="shift-type" value="Ca tối"><label for="ca-toi" data-lang-key="evening_shift_only">Ca tối</label>
@@ -47,6 +45,8 @@
                 </div>
                 
                 <button id="add-staff-button" class="btn-secondary" data-lang-key="add_member">Thêm thành viên</button>
+                <!-- NEW: Thêm nút xóa cache -->
+                <button id="clear-cache-btn" class="btn-secondary" data-lang-key="clear_cache" style="margin-top: 0.5rem;">Xóa cache</button>
             </div>
         </div>
 
